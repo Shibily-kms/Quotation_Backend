@@ -1,10 +1,9 @@
 const express = require('express')
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    console.log('Hello World');
-    res.send('Hello World')
-})
+const { getUserData, } = require('../controllers/auth-controller')
+
+router.get('/user-data/:userId', getUserData)
 
 
 module.exports = router;
