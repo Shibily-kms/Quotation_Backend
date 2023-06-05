@@ -26,6 +26,20 @@ router.route('/work-sites')
     .put(verifyUser, editSingleValue)
     .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
 
+// Water usage types
+router.route('/water-usage')
+    .get(verifyUser, getAllValue)
+    .post(verifyUser, addSingleValue)
+    .put(verifyUser, editSingleValue)
+    .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
+
+// Installation mode
+router.route('/installation-mode')
+    .get(verifyUser, getAllValue)
+    .post(verifyUser, addSingleValue)
+    .put(verifyUser, editSingleValue)
+    .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
+
 
 
 // predefined data of quotation End

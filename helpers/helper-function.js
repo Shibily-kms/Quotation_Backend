@@ -9,6 +9,10 @@ function findCurrentDataType(url) {
             return 'WATER_TEST_REPORT_SOURCE'
         case '/work-sites':
             return 'WORK_SITES'
+        case '/water-usage':
+            return 'WATER_USAGES'
+        case '/installation-mode':
+            return 'INSTALLATION_MODE'
         default:
             break;
     }
