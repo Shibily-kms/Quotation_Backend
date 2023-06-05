@@ -1,16 +1,20 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const PreDataQuotationModel = require('../models/quotation_predefined_data')
+const { findCurrentDataType } = require('../helpers/helper-function')
 
 
-// Water Test result Source (WTRS)
-const addWTRS = async (req, res) => {
+// Single Value CRUD
+const addSingleValue = async (req, res) => {
+
     try {
+        const title = findCurrentDataType(req.originalUrl)
+
         const { item } = req.body
-        const data = await PreDataQuotationModel.findOne({ title: 'WATER_TEST_REPORT_SOURCE', 'data.item': item })
+        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
 
         if (!data && item) {
-            PreDataQuotationModel.findOneAndUpdate({ title: 'WATER_TEST_REPORT_SOURCE' }, {
+            PreDataQuotationModel.findOneAndUpdate({ title }, {
                 $push: {
                     data: { item: item }
                 }
@@ -18,7 +22,6 @@ const addWTRS = async (req, res) => {
                 upsert: true, new: true
             }).then((response) => {
                 const newAddedValue = response.data[response.data.length - 1]; // Retrieve the last added value
-                console.log(newAddedValue, 'data');
                 res.status(201).json({ status: true, newValue: newAddedValue, message: 'new data added' })
             })
         } else {
@@ -30,23 +33,25 @@ const addWTRS = async (req, res) => {
     }
 }
 
-const getAllWTRS = (req, res) => {
+const getAllValue = (req, res) => {
     try {
-        PreDataQuotationModel.findOne({ title: 'WATER_TEST_REPORT_SOURCE' }).then((data) => {
-            res.status(201).json({ status: true, source: data, message: 'get WTRS items' })
+        const title = findCurrentDataType(req.originalUrl)
+        PreDataQuotationModel.findOne({ title }).then((data) => {
+            res.status(201).json({ status: true, source: data, message: 'All items' })
         })
     } catch (error) {
         throw error;
     }
 }
 
-const editWTRS = async (req, res) => {
+const editSingleValue = async (req, res) => {
     try {
+        const title = findCurrentDataType(req.originalUrl)
         const { _id, item } = req.body
-        const data = await PreDataQuotationModel.findOne({ title: 'WATER_TEST_REPORT_SOURCE', 'data.item': item })
+        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
 
         if (!data && item) {
-            PreDataQuotationModel.updateOne({ title: 'WATER_TEST_REPORT_SOURCE', 'data._id': new ObjectId(_id) }, {
+            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(_id) }, {
                 $set: {
                     'data.$.item': item
                 }
@@ -61,11 +66,13 @@ const editWTRS = async (req, res) => {
     }
 }
 
-const deleteWTRS = (req, res) => {
+const deleteSingleValue = (req, res) => {
     try {
+        const title = findCurrentDataType(req.originalUrl)
         const { id } = req.query
+
         if (id) {
-            PreDataQuotationModel.updateOne({ title: 'WATER_TEST_REPORT_SOURCE', 'data._id': new ObjectId(id) }, {
+            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(id) }, {
                 $pull: {
                     data: {
                         _id: new ObjectId(id)
@@ -82,4 +89,7 @@ const deleteWTRS = (req, res) => {
     }
 }
 
-module.exports = { addWTRS, getAllWTRS, editWTRS, deleteWTRS }
+
+module.exports = {
+    addSingleValue, editSingleValue, deleteSingleValue, getAllValue
+}

@@ -15,5 +15,5 @@ const preDataQuotationSchema = new mongoose.Schema(
         timestamps: true
     })
 
-const PreDataQuotationModel = mongoose.model('predefined_data_of_quotation', preDataQuotationSchema)
+const PreDataQuotationModel = mongoose.model('purifier_resource_datas', preDataQuotationSchema)
 module.exports = PreDataQuotationModel

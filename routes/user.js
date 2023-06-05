@@ -3,7 +3,9 @@ const router = express.Router();
 
 const { verifyUser } = require('../middlewares/verify-middleware');
 const { getUserData, } = require('../controllers/auth-controller')
-const { addWTRS, editWTRS, deleteWTRS, getAllWTRS } = require('../controllers/predefined-data-controller');
+const {
+    addSingleValue, editSingleValue, deleteSingleValue, getAllValue
+} = require('../controllers/predefined-data-controller');
 
 
 router.get('/user-data/:userId', getUserData)
@@ -12,10 +14,17 @@ router.get('/user-data/:userId', getUserData)
 
 // water Test report source (WTRS)
 router.route('/water-test-report-source')
-    .get(verifyUser, getAllWTRS)
-    .post(verifyUser, addWTRS)
-    .put(verifyUser, editWTRS)
-    .delete(verifyUser, deleteWTRS)   // ?id=  pass id with query
+    .get(verifyUser, getAllValue)
+    .post(verifyUser, addSingleValue)
+    .put(verifyUser, editSingleValue)
+    .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
+
+// Work site - home type
+router.route('/work-sites')
+    .get(verifyUser, getAllValue)
+    .post(verifyUser, addSingleValue)
+    .put(verifyUser, editSingleValue)
+    .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
 
 
 
