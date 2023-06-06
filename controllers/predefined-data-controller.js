@@ -137,9 +137,11 @@ const editSolutionModel = async (req, res) => {
     try {
         const title = 'SOLUTION_MODELS'
         const { _id, item, price } = req.body
-        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item }, { data: { $elemMatch: { item: item } } })
+        let data = await PreDataQuotationModel.findOne({ title, 'data.item': item }, { data: { $elemMatch: { item: item } } })
+        data = data?.data?.[0]?._id == _id ? null : data
 
-        if (data?.data?.[0]?._id == _id || !data && item && price) {
+
+        if (!data && item && price) {
             PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(_id) }, {
                 $set: {
                     'data.$.item': item,
@@ -310,8 +312,102 @@ const deletePurifierComponents = (req, res) => {
 }
 
 
+// Warranty
+// Soluction's Models
+
+const addWarranty = async (req, res) => {
+
+    try {
+        const title = 'WARRANTY'
+
+        const { item, warranty } = req.body
+        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
+
+        if (!data && item && warranty) {
+            PreDataQuotationModel.findOneAndUpdate({ title }, {
+                $push: {
+                    data: { item, warranty }
+                }
+            }, {
+                upsert: true, new: true
+            }).then((response) => {
+                const newAddedValue = response.data[response.data.length - 1]; // Retrieve the last added value
+                res.status(201).json({ status: true, newValue: newAddedValue, message: 'new data added' })
+            })
+        } else {
+            data && res.status(400).json({ status: false, message: 'This already existed' })
+            !item || !warranty ? res.status(400).json({ status: false, message: 'All Field Required' }) : ''
+        }
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+const getAllWarranty = (req, res) => {
+    try {
+        const title = 'WARRANTY'
+        PreDataQuotationModel.findOne({ title }).then((data) => {
+            res.status(201).json({ status: true, items: data, message: 'All items' })
+        })
+    } catch (error) {
+        throw error;
+    }
+}
+
+const editWarranty = async (req, res) => {
+    try {
+        const title = 'WARRANTY'
+        const { _id, item, warranty } = req.body
+        let data = await PreDataQuotationModel.findOne({ title, 'data.item': item }, { data: { $elemMatch: { item: item } } })
+        data = data?.data?.[0]?._id == _id ? null : data
+
+        if (!data && item && warranty) {
+            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(_id) }, {
+                $set: {
+                    'data.$.item': item,
+                    'data.$.warranty': warranty
+                }
+            }).then(() => {
+                res.status(201).json({ status: true, message: 'Updated' })
+            })
+        } else {
+            data && res.status(400).json({ status: false, message: 'This already existed' })
+            !item || !warranty ? res.status(400).json({ status: false, message: 'All Field Required' }) : ''
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+const deleteWarranty = (req, res) => {
+    try {
+        const title = 'WARRANTY'
+        const { id } = req.query
+
+        if (id) {
+            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(id) }, {
+                $pull: {
+                    data: {
+                        _id: new ObjectId(id)
+                    }
+                }
+            }).then(() => {
+                res.status(201).json({ status: true, message: 'Removed' })
+            })
+        } else {
+            res.status(400).json({ status: false, message: 'Pass id with query' })
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
     addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
     addPurifierComponents, editPurifierComponents, deletePurifierComponents, getAllPurifierComponents,
+    addWarranty, editWarranty, deleteWarranty, getAllWarranty
 }

@@ -6,7 +6,8 @@ const { getUserData, } = require('../controllers/auth-controller')
 const {
     addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
     addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
-    addPurifierComponents, editPurifierComponents, deletePurifierComponents, getAllPurifierComponents
+    addPurifierComponents, editPurifierComponents, deletePurifierComponents, getAllPurifierComponents,
+    addWarranty, editWarranty, deleteWarranty, getAllWarranty
 } = require('../controllers/predefined-data-controller');
 
 
@@ -56,6 +57,13 @@ router.route('/purifier-component')
     .post(verifyUser, addPurifierComponents)
     .put(verifyUser, editPurifierComponents)
     .delete(verifyUser, deletePurifierComponents)   // ?id=  pass id with query
+
+// Warranty
+router.route('/warranty')
+    .get(verifyUser, getAllWarranty)
+    .post(verifyUser, addWarranty)
+    .put(verifyUser, editWarranty)
+    .delete(verifyUser, deleteWarranty)   // ?id=  pass id with query
 
 
 

@@ -11,7 +11,8 @@ const preDataQuotationSchema = new mongoose.Schema(
             price: Number,
             brands: [{
                 brand: String
-            }]
+            }],
+            warranty : String
         }]
     },
     {
