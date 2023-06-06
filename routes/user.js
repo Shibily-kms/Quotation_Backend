@@ -4,7 +4,8 @@ const router = express.Router();
 const { verifyUser } = require('../middlewares/verify-middleware');
 const { getUserData, } = require('../controllers/auth-controller')
 const {
-    addSingleValue, editSingleValue, deleteSingleValue, getAllValue
+    addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
+    addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel
 } = require('../controllers/predefined-data-controller');
 
 
@@ -39,6 +40,14 @@ router.route('/installation-mode')
     .post(verifyUser, addSingleValue)
     .put(verifyUser, editSingleValue)
     .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
+
+
+// Installation mode
+router.route('/solution-model')
+    .get(verifyUser, getAllSolutionModel)
+    .post(verifyUser, addSolutionModel)
+    .put(verifyUser, editSolutionModel)
+    .delete(verifyUser, deleteSolutionModel)   // ?id=  pass id with query
 
 
 

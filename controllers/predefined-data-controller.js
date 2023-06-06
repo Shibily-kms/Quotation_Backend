@@ -25,7 +25,8 @@ const addSingleValue = async (req, res) => {
                 res.status(201).json({ status: true, newValue: newAddedValue, message: 'new data added' })
             })
         } else {
-            res.status(400).json({ status: false, message: 'This already existed' })
+            data && res.status(400).json({ status: false, message: 'This already existed' })
+            !item && res.status(400).json({ status: false, message: 'All Field Required' })
         }
 
     } catch (error) {
@@ -59,7 +60,8 @@ const editSingleValue = async (req, res) => {
                 res.status(201).json({ status: true, message: 'Updated' })
             })
         } else {
-            res.status(400).json({ status: false, message: 'This already existed' })
+            data && res.status(400).json({ status: false, message: 'This already existed' })
+            !item && res.status(400).json({ status: false, message: 'All Field Required' })
         }
     } catch (error) {
         throw error;
@@ -89,7 +91,97 @@ const deleteSingleValue = (req, res) => {
     }
 }
 
+// Soluction's Models
+
+const addSolutionModel = async (req, res) => {
+    console.log('in add');
+    try {
+        const title = 'SOLUTION_MODELS'
+
+        const { item, price } = req.body
+        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
+
+        if (!data && item && price) {
+            PreDataQuotationModel.findOneAndUpdate({ title }, {
+                $push: {
+                    data: { item, price: Number(price) }
+                }
+            }, {
+                upsert: true, new: true
+            }).then((response) => {
+                const newAddedValue = response.data[response.data.length - 1]; // Retrieve the last added value
+                res.status(201).json({ status: true, newValue: newAddedValue, message: 'new data added' })
+            })
+        } else {
+            data && res.status(400).json({ status: false, message: 'This already existed' })
+            !item || !price && res.status(400).json({ status: false, message: 'All Field Required' })
+        }
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+const getAllSolutionModel = (req, res) => {
+    try {
+        const title = 'SOLUTION_MODELS'
+        PreDataQuotationModel.findOne({ title }).then((data) => {
+            res.status(201).json({ status: true, items: data, message: 'All items' })
+        })
+    } catch (error) {
+        throw error;
+    }
+}
+
+const editSolutionModel = async (req, res) => {
+    try {
+        const title = 'SOLUTION_MODELS'
+        const { _id, item, price } = req.body
+        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item }, { data: { $elemMatch: { item: item } } })
+
+        if (data?.data?.[0]?._id == _id || !data && item && price) {
+            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(_id) }, {
+                $set: {
+                    'data.$.item': item,
+                    'data.$.price': Number(price)
+                }
+            }).then(() => {
+                res.status(201).json({ status: true, message: 'Updated' })
+            })
+        } else {
+            data && res.status(400).json({ status: false, message: 'This already existed' })
+            !item || !price && res.status(400).json({ status: false, message: 'All Field Required' })
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
+const deleteSolutionModel = (req, res) => {
+    try {
+        const title = 'SOLUTION_MODELS'
+        const { id } = req.query
+
+        if (id) {
+            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(id) }, {
+                $pull: {
+                    data: {
+                        _id: new ObjectId(id)
+                    }
+                }
+            }).then(() => {
+                res.status(201).json({ status: true, message: 'Removed' })
+            })
+        } else {
+            res.status(400).json({ status: false, message: 'Pass id with query' })
+        }
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 module.exports = {
-    addSingleValue, editSingleValue, deleteSingleValue, getAllValue
+    addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
+    addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel
 }
