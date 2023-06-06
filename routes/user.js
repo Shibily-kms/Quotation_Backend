@@ -5,7 +5,8 @@ const { verifyUser } = require('../middlewares/verify-middleware');
 const { getUserData, } = require('../controllers/auth-controller')
 const {
     addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
-    addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel
+    addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
+    addPurifierComponents, editPurifierComponents, deletePurifierComponents, getAllPurifierComponents
 } = require('../controllers/predefined-data-controller');
 
 
@@ -42,12 +43,19 @@ router.route('/installation-mode')
     .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
 
 
-// Installation mode
+// Solution Model
 router.route('/solution-model')
     .get(verifyUser, getAllSolutionModel)
     .post(verifyUser, addSolutionModel)
     .put(verifyUser, editSolutionModel)
     .delete(verifyUser, deleteSolutionModel)   // ?id=  pass id with query
+
+// Purifier Components
+router.route('/purifier-component')
+    .get(verifyUser, getAllPurifierComponents)
+    .post(verifyUser, addPurifierComponents)
+    .put(verifyUser, editPurifierComponents)
+    .delete(verifyUser, deletePurifierComponents)   // ?id=  pass id with query
 
 
 

@@ -8,7 +8,10 @@ const preDataQuotationSchema = new mongoose.Schema(
         },
         data: [{
             item: String,
-            price : Number
+            price: Number,
+            brands: [{
+                brand: String
+            }]
         }]
     },
     {
