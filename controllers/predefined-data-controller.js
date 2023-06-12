@@ -96,7 +96,7 @@ const deleteSingleValue = (req, res) => {
 const addSolutionModel = async (req, res) => {
 
     try {
-        const title = 'PURIFIER_SOLUTION_MODELS'
+        const title = findCurrentDataType(req.originalUrl)
 
         const { item, price } = req.body
         const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
@@ -124,7 +124,7 @@ const addSolutionModel = async (req, res) => {
 
 const getAllSolutionModel = (req, res) => {
     try {
-        const title = 'PURIFIER_SOLUTION_MODELS'
+        const title = findCurrentDataType(req.originalUrl)
         PreDataQuotationModel.findOne({ title }).then((data) => {
             res.status(201).json({ status: true, items: data, message: 'All items' })
         })
@@ -135,7 +135,7 @@ const getAllSolutionModel = (req, res) => {
 
 const editSolutionModel = async (req, res) => {
     try {
-        const title = 'PURIFIER_SOLUTION_MODELS'
+        const title = findCurrentDataType(req.originalUrl)
         const { _id, item, price } = req.body
         let data = await PreDataQuotationModel.findOne({ title, 'data.item': item }, { data: { $elemMatch: { item: item } } })
         data = data?.data?.[0]?._id == _id ? null : data
@@ -161,7 +161,7 @@ const editSolutionModel = async (req, res) => {
 
 const deleteSolutionModel = (req, res) => {
     try {
-        const title = 'PURIFIER_SOLUTION_MODELS'
+        const title = findCurrentDataType(req.originalUrl)
         const { id } = req.query
 
         if (id) {
@@ -185,13 +185,16 @@ const deleteSolutionModel = (req, res) => {
 
 // Purifier Components
 
-const addPurifierComponents = async (req, res) => {
+const addComponents = async (req, res) => {
 
     try {
-        const title = 'PURIFIER_COMPONENTS'
+        const title = findCurrentDataType(req.originalUrl)
 
         const { name, brand } = req.body
-        const data = await PreDataQuotationModel.findOne({ title, 'data.item': name, 'data.brands.brand': brand })
+        let data = await PreDataQuotationModel.findOne({ title, 'data.item': name, 'data.brands.brand': brand },
+            { data: { $elemMatch: { item: name, brands: { $elemMatch: { brand } } } } })
+        data = data?.data.length === 0 ? null : data
+        console.log(data, 'ddd');
 
         if (!data && name && brand) {
             let check = await PreDataQuotationModel.findOne({ title, 'data.item': name })
@@ -244,9 +247,9 @@ const addPurifierComponents = async (req, res) => {
     }
 }
 
-const getAllPurifierComponents = (req, res) => {
+const getAllComponents = (req, res) => {
     try {
-        const title = 'PURIFIER_COMPONENTS'
+        const title = findCurrentDataType(req.originalUrl)
         PreDataQuotationModel.findOne({ title }).then((data) => {
             res.status(201).json({ status: true, items: data, message: 'All items' })
         })
@@ -255,9 +258,9 @@ const getAllPurifierComponents = (req, res) => {
     }
 }
 
-const editPurifierComponents = async (req, res) => {
+const editComponents = async (req, res) => {
     try {
-        const title = 'PURIFIER_COMPONENTS'
+        const title = findCurrentDataType(req.originalUrl)
         const { nameId, brandId, name, brand } = req.body
 
         let data = await PreDataQuotationModel.findOne({ title, 'data.item': name, 'data.brands.brand': brand },
@@ -286,9 +289,9 @@ const editPurifierComponents = async (req, res) => {
     }
 }
 
-const deletePurifierComponents = (req, res) => {
+const deleteComponents = (req, res) => {
     try {
-        const title = 'PURIFIER_COMPONENTS'
+        const title = findCurrentDataType(req.originalUrl)
         const { nameId, brandId } = req.query
 
         if (nameId && brandId) {
@@ -317,5 +320,5 @@ const deletePurifierComponents = (req, res) => {
 module.exports = {
     addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
     addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
-    addPurifierComponents, editPurifierComponents, deletePurifierComponents, getAllPurifierComponents
+    addComponents, editComponents, deleteComponents, getAllComponents
 }
