@@ -1,15 +1,25 @@
 const QuotationInputModel = require('../models/quotation-inputs-data')
 const { verifyQutationInputs } = require('../helpers/validate-function')
 const { createQutationId } = require('../helpers/helper-function')
+const { uploadSignature } = require('../helpers/upload-image')
 
 const postQuotationForm = async (req, res) => {
     try {
         let verifyInputs = verifyQutationInputs(req.body)
         if (verifyInputs.status) {
-            let lastData = await QuotationInputModel.findOne({ type: req.body.type, visit_date: req.body.visit_date })
-            req.body.index = lastData?.index ? lastData?.index + 1 : 1
-            req.body.service_srl_number = createQutationId(req.body.type, req.body.visit_date, (req.body.index))
-            QuotationInputModel.create(req.body).then((response) => {
+
+            let lastData = await QuotationInputModel.find({ type: req.body.type, visit_date: req.body.visit_date })
+            //index
+            req.body.index = lastData[lastData.length - 1]?.index ? lastData[lastData.length - 1]?.index + 1 : 1
+            // Qutation srl number
+            req.body.quotation_srl_no = createQutationId(req.body.type, req.body.visit_date, (req.body.index))
+            // Save Signature in Folder
+            let customer = await uploadSignature(req.body.sign.customer, req.body.quotation_srl_no, 'customer')
+            let authorized = await uploadSignature(req.body.sign.authorized, req.body.quotation_srl_no, 'authorized')
+            req.body.sign = { customer, authorized }
+
+            // Upload to DB
+            await QuotationInputModel.create(req.body).then((response) => {
                 res.status(201).json({ status: true, quotation: response, message: 'new quotation' })
             })
 

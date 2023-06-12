@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const quotationInputSchema = new mongoose.Schema(
     {
-        service_srl_number: String,
+        quotation_srl_no: String,
         index : Number,
         type: String,
         visit_date: String,

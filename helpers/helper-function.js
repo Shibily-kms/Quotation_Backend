@@ -43,12 +43,16 @@ function createQutationId(type, date, index) {
     switch (type) {
         case 'purifier':
             text = 'PQ'
+            break;
 
         case 'whole-house':
             text = 'WHQ'
+            break;
+
 
         case 'wh-and-perifier':
             text = 'WHPQ'
+            break;
 
         default:
             break;
@@ -57,7 +61,6 @@ function createQutationId(type, date, index) {
     let ISODate = new Date(date)
     let months = ISODate.getMonth() + 1
     months = months < 10 ? '0' + months : months
-
     return text + ISODate.getDate() + months + ISODate.getFullYear() + index
 }
 
