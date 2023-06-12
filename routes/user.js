@@ -6,15 +6,16 @@ const { getUserData, } = require('../controllers/auth-controller')
 const {
     addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
     addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
-    addPurifierComponents, editPurifierComponents, deletePurifierComponents, getAllPurifierComponents,
+    addComponents, editComponents, deleteComponents, getAllComponents,
 } = require('../controllers/predefined-data-controller');
-const {postQuotationForm} = require('../controllers/quotation-controller')
+const { postQuotationForm, getAllQuotations } = require('../controllers/quotation-controller')
 
 
 router.get('/user-data/:userId', getUserData)
 
 // Quotation Inputs
 router.route('/quotation')
+    .get(verifyUser, getAllQuotations)
     .post(verifyUser, postQuotationForm)
 
 // predefined data of quotation Start
@@ -48,8 +49,8 @@ router.route('/installation-mode')
     .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
 
 
-// Solution Model
-router.route('/solution-model')
+// Purifier Solution Model
+router.route('/purifier-solution-model')
     .get(verifyUser, getAllSolutionModel)
     .post(verifyUser, addSolutionModel)
     .put(verifyUser, editSolutionModel)
@@ -57,10 +58,33 @@ router.route('/solution-model')
 
 // Purifier Components
 router.route('/purifier-component')
-    .get(verifyUser, getAllPurifierComponents)
-    .post(verifyUser, addPurifierComponents)
-    .put(verifyUser, editPurifierComponents)
-    .delete(verifyUser, deletePurifierComponents)   // ?id=  pass id with query
+    .get(verifyUser, getAllComponents)
+    .post(verifyUser, addComponents)
+    .put(verifyUser, editComponents)
+    .delete(verifyUser, deleteComponents)   // ?id=  pass id with query
+
+
+// Whole House Solution Model
+router.route('/wh-solution-model')
+    .get(verifyUser, getAllSolutionModel)
+    .post(verifyUser, addSolutionModel)
+    .put(verifyUser, editSolutionModel)
+    .delete(verifyUser, deleteSolutionModel)   // ?id=  pass id with query
+
+// Purifier Components
+router.route('/vfs-component')
+    .get(verifyUser, getAllComponents)
+    .post(verifyUser, addComponents)
+    .put(verifyUser, editComponents)
+    .delete(verifyUser, deleteComponents)   // ?id=  pass id with query
+
+
+// Purifier Components
+router.route('/vfs-materials')
+    .get(verifyUser, getAllComponents)
+    .post(verifyUser, addComponents)
+    .put(verifyUser, editComponents)
+    .delete(verifyUser, deleteComponents)   // ?id=  pass id with query
 
 
 

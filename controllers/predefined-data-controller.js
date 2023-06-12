@@ -194,7 +194,6 @@ const addComponents = async (req, res) => {
         let data = await PreDataQuotationModel.findOne({ title, 'data.item': name, 'data.brands.brand': brand },
             { data: { $elemMatch: { item: name, brands: { $elemMatch: { brand } } } } })
         data = data?.data.length === 0 ? null : data
-        console.log(data, 'ddd');
 
         if (!data && name && brand) {
             let check = await PreDataQuotationModel.findOne({ title, 'data.item': name })

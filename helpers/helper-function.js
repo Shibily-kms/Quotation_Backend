@@ -38,14 +38,27 @@ function findCurrentDataType(url) {
 
 }
 
-function createQutationId(type, date, slNo) {
-    let text = type === 'purifier' ? "PQ" : null
+function createQutationId(type, date, index) {
+    let text = null
+    switch (type) {
+        case 'purifier':
+            text = 'PQ'
+
+        case 'whole-house':
+            text = 'WHQ'
+
+        case 'wh-and-perifier':
+            text = 'WHPQ'
+
+        default:
+            break;
+    }
 
     let ISODate = new Date(date)
     let months = ISODate.getMonth() + 1
     months = months < 10 ? '0' + months : months
 
-    return text + ISODate.getDate() + months + ISODate.getFullYear() + slNo
+    return text + ISODate.getDate() + months + ISODate.getFullYear() + index
 }
 
 
