@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router();
 
 const { verifyUser } = require('../middlewares/verify-middleware');
-const { getUserData, } = require('../controllers/auth-controller')
+const { userVerifyForSales, } = require('../controllers/auth-controller')
 const {
     addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
     addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
@@ -11,7 +11,7 @@ const {
 const { postQuotationForm, getAllQuotations,deleteQuotation } = require('../controllers/quotation-controller')
 
 
-router.get('/user-data/:userId', getUserData)
+router.get('/user-verify/:userId', userVerifyForSales)
 
 // Quotation Inputs
 router.route('/quotation')
