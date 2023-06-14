@@ -22,6 +22,11 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use('/', userRouter);
 
+// To serve images for public
+app.use(express.static("Public"));
+app.use("/images", express.static("./assets/images"));
+
+
 app.use(errorHandler)
 
 

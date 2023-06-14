@@ -43,4 +43,24 @@ const getAllQuotations = (req, res) => {
     }
 }
 
-module.exports = { postQuotationForm, getAllQuotations }
+const deleteQuotation = (req, res) => {
+    try {
+        let { slno } = req.query
+        if (slno) {
+            QuotationInputModel.deleteOne({ quotation_srl_no: slno }).then((response) => {
+                if(response.deletedCount){
+                    res.status(201).json({ status: true, message: 'deleted' })
+                }else{
+                    res.status(400).json({ status: false, message: 'no mated quotation' })
+                }
+            }).catch((error) => {
+            })
+        } else {
+            res.status(400).json({ status: false, message: 'add slno in query' })
+        }
+    } catch (error) {
+
+    }
+}
+
+module.exports = { postQuotationForm, getAllQuotations, deleteQuotation }

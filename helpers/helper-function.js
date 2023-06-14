@@ -50,7 +50,7 @@ function createQutationId(type, date, index) {
             break;
 
 
-        case 'wh-and-perifier':
+        case 'wh-and-purifier':
             text = 'WHPQ'
             break;
 

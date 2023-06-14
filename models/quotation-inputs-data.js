@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const quotationInputSchema = new mongoose.Schema(
     {
         quotation_srl_no: String,
-        index : Number,
+        index: Number,
         type: String,
         visit_date: String,
         customer: {
@@ -19,7 +19,7 @@ const quotationInputSchema = new mongoose.Schema(
             source: String,
             tds: Number,
             ph: Number,
-            fa: Number,
+            fe: Number,
             ca: Number
         },
         findings: [{ text: String }],
@@ -48,6 +48,9 @@ const quotationInputSchema = new mongoose.Schema(
         vfs_component: [{ item: String, brand: String }],
         purifier_component: [{ item: String, brand: String }],
         tac: [{ text: String }],
+        purifier_max_usage: Number,
+        vfws_max_usage: Number,
+        expr_date: String,
         sign: { customer: String, authorized: String }
     },
     {

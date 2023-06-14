@@ -8,7 +8,7 @@ const {
     addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
     addComponents, editComponents, deleteComponents, getAllComponents,
 } = require('../controllers/predefined-data-controller');
-const { postQuotationForm, getAllQuotations } = require('../controllers/quotation-controller')
+const { postQuotationForm, getAllQuotations,deleteQuotation } = require('../controllers/quotation-controller')
 
 
 router.get('/user-data/:userId', getUserData)
@@ -17,6 +17,7 @@ router.get('/user-data/:userId', getUserData)
 router.route('/quotation')
     .get(verifyUser, getAllQuotations)
     .post(verifyUser, postQuotationForm)
+    .delete(verifyUser, deleteQuotation)
 
 // predefined data of quotation Start
 
