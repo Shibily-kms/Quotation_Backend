@@ -12,9 +12,9 @@ const userRouter = require('./routes/user')
 // dB connect
 connectDB()
 
-const { errorHandler } = require('./middlewares/error-middleware')
+const { errorHandler } = require('./middleware/error-middleware')
 
-// Middlewares
+// Middleware
 app.use(cors())
 app.use(cookieParser())
 app.use(express.json())

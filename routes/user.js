@@ -1,14 +1,14 @@
 const express = require('express')
 const router = express.Router();
 
-const { verifyUser } = require('../middlewares/verify-middleware');
+const { verifyUser } = require('../middleware/verify-middleware');
 const { userVerifyForSales, } = require('../controllers/auth-controller')
 const {
     addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
     addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
     addComponents, editComponents, deleteComponents, getAllComponents,
 } = require('../controllers/predefined-data-controller');
-const { postQuotationForm, getAllQuotations,deleteQuotation } = require('../controllers/quotation-controller')
+const { postQuotationForm, getAllQuotations, deleteQuotation } = require('../controllers/quotation-controller')
 
 
 router.get('/user-verify/:userId', userVerifyForSales)
@@ -19,7 +19,7 @@ router.route('/quotation')
     .post(verifyUser, postQuotationForm)
     .delete(verifyUser, deleteQuotation)
 
-// predefined data of quotation Start
+//* predefined data of quotation Start
 
 // water Test report source (WTRS)
 router.route('/water-test-report-source')
@@ -88,9 +88,6 @@ router.route('/vfs-materials')
     .delete(verifyUser, deleteComponents)   // ?id=  pass id with query
 
 
-
-// predefined data of quotation End
-
-
+//! predefined data of quotation End 
 
 module.exports = router;

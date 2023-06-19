@@ -1,32 +1,51 @@
-const fs = require('fs');
-const path = require('path');
+const AWS = require('aws-sdk');
+
+const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+const bucketName = process.env.S3_BUCKET_NAME
 
 async function uploadSignature(image, srlNo, addition) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
 
-        // Define the folder where you want to save the images
-        const uploadFolder = path.join(__dirname, '../assets/images/signature');
-
-        // Create the uploads folder if it doesn't exist
-        if (!fs.existsSync(uploadFolder)) {
-            fs.mkdirSync(uploadFolder);
-        }
-
+        // ? Convert Base64 to Image
         const imageData = image.replace(/^data:image\/\w+;base64,/, '');
         const imageBuffer = Buffer.from(imageData, 'base64');
 
-        const fileName = `${srlNo + addition}.png`;
-        const filePath = path.join(uploadFolder, fileName);
+        // ? Upload to S3 Bucket
+        const params = {
+            Bucket: bucketName,
+            Key: `${srlNo + addition}.png`,
+            Body: imageBuffer,
+            ContentType: 'image/png'
+        };
 
-        fs.writeFile(filePath, imageBuffer, (error) => {
-            if (error) {
-                console.error('Error saving image:', error);
-                reject(error);
+        s3.upload(params, function (err, data) {
+            if (err) {
+                reject(err)
             } else {
-                resolve(fileName);
+                resolve({ key: params.Key, url: data.Location })
+            }
+        });
+
+    })
+}
+
+function deleteSignature(key) {
+    return new Promise((resolve, reject) => {
+        s3.deleteObject({
+            Bucket: bucketName,
+            Key: key,
+        }, (err, data) => {
+            if (err) {
+                reject(err)
+                console.error(err);
+            } else {
+                resolve('Signature Deleted')
             }
         });
     })
 }
 
-module.exports = { uploadSignature }
+module.exports = { uploadSignature, deleteSignature }

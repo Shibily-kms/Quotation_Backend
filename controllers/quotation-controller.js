@@ -1,22 +1,25 @@
 const QuotationInputModel = require('../models/quotation-inputs-data')
-const { verifyQutationInputs } = require('../helpers/validate-function')
-const { createQutationId } = require('../helpers/helper-function')
-const { uploadSignature } = require('../helpers/upload-image')
+const { verifyQuotationInputs } = require('../helpers/validate-function')
+const { createQuotationId } = require('../helpers/helper-function')
+const { uploadSignature, deleteSignature } = require('../helpers/upload-image')
 
 const postQuotationForm = async (req, res) => {
     try {
-      
-        let verifyInputs = verifyQutationInputs(req.body)
+
+        let verifyInputs = verifyQuotationInputs(req.body)
         if (verifyInputs.status) {
 
             let lastData = await QuotationInputModel.find({ type: req.body.type, visit_date: req.body.visit_date })
+
             //index
             req.body.index = lastData[lastData.length - 1]?.index ? lastData[lastData.length - 1]?.index + 1 : 1
-            // Qutation srl number
-            req.body.quotation_srl_no = createQutationId(req.body.type, req.body.visit_date, (req.body.index))
+
+            // Quotation srl number
+            req.body.quotation_srl_no = createQuotationId(req.body.type, req.body.visit_date, (req.body.index))
+
             // Save Signature in Folder
-            let customer = await uploadSignature(req.body.sign.customer, req.body.quotation_srl_no, 'customer')
-            let authorized = await uploadSignature(req.body.sign.authorized, req.body.quotation_srl_no, 'authorized')
+            let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
+            let authorized = await uploadSignature(req.body.sign.authorized.url, req.body.quotation_srl_no, 'authorized')
             req.body.sign = { customer, authorized }
 
             // Upload to DB
@@ -44,23 +47,30 @@ const getAllQuotations = (req, res) => {
     }
 }
 
-const deleteQuotation = (req, res) => {
+const deleteQuotation = async (req, res) => {
     try {
         let { slno } = req.query
         if (slno) {
-            QuotationInputModel.deleteOne({ quotation_srl_no: slno }).then((response) => {
-                if(response.deletedCount){
-                    res.status(201).json({ status: true, message: 'deleted' })
-                }else{
-                    res.status(400).json({ status: false, message: 'no mated quotation' })
-                }
-            }).catch((error) => {
-            })
+            let quotation = await QuotationInputModel.findOne({ quotation_srl_no: slno })
+            if (quotation) {
+                QuotationInputModel.deleteOne({ quotation_srl_no: slno }).then(async(response) => {
+                    if (response.deletedCount) {
+                        // ? delete signature 
+                        // await deleteSignature(quotation?.sign?.customer?.key)
+                        // await deleteSignature(quotation?.sign?.authorized?.key)
+                        res.status(201).json({ status: true, message: 'quotation deleted' })
+                    } else {
+                        res.status(400).json({ status: false, message: 'no mated quotation' })
+                    }
+                })
+            } else {
+                res.status(400).json({ status: false, message: 'no quotation available' })
+            }
         } else {
             res.status(400).json({ status: false, message: 'add slno in query' })
         }
-    } catch (error) {
-
+    } catch (error) {  
+        throw error;
     }
 }
 

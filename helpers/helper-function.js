@@ -38,7 +38,7 @@ function findCurrentDataType(url) {
 
 }
 
-function createQutationId(type, date, index) {
+function createQuotationId(type, date, index) {
     let text = null
     switch (type) {
         case 'purifier':
@@ -65,4 +65,4 @@ function createQutationId(type, date, index) {
 }
 
 
-module.exports = { findCurrentDataType, createQutationId }
+module.exports = { findCurrentDataType, createQuotationId }
