@@ -9,9 +9,12 @@ const preDataQuotationSchema = new mongoose.Schema(
         data: [{
             item: String,
             price: Number,
-            brands: [{
-                brand: String
-            }],
+            brands: {
+                type: [{
+                    brand: String
+                }],
+                default: undefined // Setting default value to undefined
+            },
             warranty: String
         }]
     },

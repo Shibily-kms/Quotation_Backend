@@ -19,8 +19,7 @@ const postQuotationForm = async (req, res) => {
 
             // Save Signature in Folder
             let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
-            let authorized = await uploadSignature(req.body.sign.authorized.url, req.body.quotation_srl_no, 'authorized')
-            req.body.sign = { customer, authorized }
+            req.body.sign = { customer }
 
             // Upload to DB
             await QuotationInputModel.create(req.body).then((response) => {
@@ -28,11 +27,15 @@ const postQuotationForm = async (req, res) => {
             })
 
         } else {
-            res.status(400).json({ status: true, message: verifyInputs.message })
+            res.status(400).json({ status: false, message: verifyInputs.message })
         }
 
     } catch (error) {
-        throw error;
+        if (error.name === 'UnknownEndpoint') {
+            res.status(400).json({ status: false, message: 'No proper internet connection' })
+        } else {
+            throw error;
+        }
     }
 }
 
@@ -53,7 +56,7 @@ const deleteQuotation = async (req, res) => {
         if (slno) {
             let quotation = await QuotationInputModel.findOne({ quotation_srl_no: slno })
             if (quotation) {
-                QuotationInputModel.deleteOne({ quotation_srl_no: slno }).then(async(response) => {
+                QuotationInputModel.deleteOne({ quotation_srl_no: slno }).then(async (response) => {
                     if (response.deletedCount) {
                         // ? delete signature 
                         // await deleteSignature(quotation?.sign?.customer?.key)
@@ -69,7 +72,7 @@ const deleteQuotation = async (req, res) => {
         } else {
             res.status(400).json({ status: false, message: 'add slno in query' })
         }
-    } catch (error) {  
+    } catch (error) {
         throw error;
     }
 }

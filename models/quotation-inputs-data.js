@@ -6,6 +6,7 @@ const quotationInputSchema = new mongoose.Schema(
         index: Number,
         type: String,
         visit_date: String,
+        enquiry_srl_no: String,
         customer: {
             name: String,
             address: String,
@@ -30,7 +31,7 @@ const quotationInputSchema = new mongoose.Schema(
             water_point: Boolean,
             plug_point: Boolean
         },
-        vfws_report: {
+        vfs_report: {
             site: String,
             usage: String,
             tank_capasity: Number,
@@ -43,15 +44,15 @@ const quotationInputSchema = new mongoose.Schema(
         },
         preferred_solution: [{ item: String, price: Number }],
         cust_preferred_solution: [{ item: String, price: Number }],
-        warranty: { pws: String, vfws: String },
+        warranty: { pws: String, vfs: String },
         materials: [{ item: String, brand: String }],
         vfs_component: [{ item: String, brand: String }],
         purifier_component: [{ item: String, brand: String }],
         tac: [{ text: String }],
         purifier_max_usage: Number,
-        vfws_max_usage: Number,
+        vfs_max_usage: Number,
         expr_date: String,
-        sign: { customer: {}, authorized: {} }
+        sign: { customer: {} }
     },
     {
         timestamps: true
