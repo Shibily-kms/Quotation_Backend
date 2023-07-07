@@ -6,6 +6,8 @@ const designationSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        allow_sales: Boolean,
+        auto_punch_out : String,
         name: [
             {
                 type: mongoose.Schema.Types.ObjectId,

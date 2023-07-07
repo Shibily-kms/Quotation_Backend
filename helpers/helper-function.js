@@ -1,4 +1,5 @@
 const URL = require('url');
+const { DDMMYYYYFormat } = require('./date-formate')
 
 function findCurrentDataType(url) {
     const parsedUrl = URL.parse(url);
@@ -38,7 +39,7 @@ function findCurrentDataType(url) {
 
 }
 
-function createQuotationId(type, date, index) {
+function createQuotationId(type, ISOdate, index) {
     let text = null
     switch (type) {
         case 'purifier':
@@ -58,10 +59,9 @@ function createQuotationId(type, date, index) {
             break;
     }
 
-    let ISODate = new Date(date)
-    let months = ISODate.getMonth() + 1
-    months = months < 10 ? '0' + months : months
-    return text + ISODate.getDate() + months + ISODate.getFullYear() + index
+    let date = DDMMYYYYFormat(ISOdate, '')
+
+    return text + date + index
 }
 
 

@@ -2,24 +2,29 @@ const QuotationInputModel = require('../models/quotation-inputs-data')
 const { verifyQuotationInputs } = require('../helpers/validate-function')
 const { createQuotationId } = require('../helpers/helper-function')
 const { uploadSignature, deleteSignature } = require('../helpers/upload-image')
+const { YYYYMMDDFormat } = require('../helpers/date-formate')
 
 const postQuotationForm = async (req, res) => {
     try {
 
         let verifyInputs = verifyQuotationInputs(req.body)
         if (verifyInputs.status) {
+            let today = new Date()
+            today.setHours(0, 0, 0, 0);
 
-            let lastData = await QuotationInputModel.find({ type: req.body.type, visit_date: req.body.visit_date })
+            let lastData = await QuotationInputModel.find({ type: req.body.type, createdAt: { $gte: today } })
 
             //index
             req.body.index = lastData[lastData.length - 1]?.index ? lastData[lastData.length - 1]?.index + 1 : 1
 
             // Quotation srl number
-            req.body.quotation_srl_no = createQuotationId(req.body.type, req.body.visit_date, (req.body.index))
+            req.body.quotation_srl_no = createQuotationId(req.body.type, new Date(), (req.body.index))
 
             // Save Signature in Folder
-            let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
-            req.body.sign = { customer }
+            if (req.body?.customer?.url) {
+                let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
+                req.body.sign = { customer }
+            }
 
             // Upload to DB
             await QuotationInputModel.create(req.body).then((response) => {

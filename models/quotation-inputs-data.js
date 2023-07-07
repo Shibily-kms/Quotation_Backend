@@ -52,6 +52,8 @@ const quotationInputSchema = new mongoose.Schema(
         purifier_max_usage: Number,
         vfs_max_usage: Number,
         expr_date: String,
+        ps_total: Number,
+        css_total: Number,
         sign: { customer: {} }
     },
     {
