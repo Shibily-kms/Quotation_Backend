@@ -50,9 +50,7 @@ const updateQuotationForm = async (req, res) => {
 
         // Save Signature in Folder
         if (req.body?.sign?.customer?.url && !req.body?.sign?.customer?.key) {
-            console.log('sign');
             let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
-            console.log(customer, 'result');
             req.body.sign = { customer }
         }
         await QuotationInputModel.updateOne({ _id: new ObjectId(req.body._id) }, {

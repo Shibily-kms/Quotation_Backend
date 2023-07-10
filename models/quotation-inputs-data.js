@@ -17,6 +17,7 @@ const quotationInputSchema = new mongoose.Schema(
             mobile: String
         },
         test_report: {
+            type_of : String,
             source: String,
             tds: Number,
             ph: Number,
