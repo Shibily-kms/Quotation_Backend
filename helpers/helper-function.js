@@ -50,7 +50,6 @@ function createQuotationId(type, ISOdate, index) {
             text = 'WHQ'
             break;
 
-
         case 'wh-and-purifier':
             text = 'WHPQ'
             break;

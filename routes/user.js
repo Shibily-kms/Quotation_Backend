@@ -2,91 +2,88 @@ const express = require('express')
 const router = express.Router();
 
 const { verifyUser } = require('../middleware/verify-middleware');
-const { userVerifyForSales, } = require('../controllers/auth-controller')
-const {
-    addSingleValue, editSingleValue, deleteSingleValue, getAllValue,
-    addSolutionModel, editSolutionModel, deleteSolutionModel, getAllSolutionModel,
-    addComponents, editComponents, deleteComponents, getAllComponents,
-} = require('../controllers/predefined-data-controller');
-const { postQuotationForm, getAllQuotations, deleteQuotation, updateQuotationForm } = require('../controllers/quotation-controller')
+const authController = require('../controllers/auth-controller')
+const predefinedDataController = require('../controllers/predefined-data-controller');
+const quotationController = require('../controllers/quotation-controller')
 
 
-router.get('/user-verify/:userId', userVerifyForSales)
+// Auto SignUp
+router.get('/user-verify/:userId', authController.userVerifyForSales)
 
 // Quotation Inputs
 router.route('/quotation')
-    .get(verifyUser, getAllQuotations)
-    .post(verifyUser, postQuotationForm)
-    .put(verifyUser, updateQuotationForm)
-    .delete(verifyUser, deleteQuotation)
+    .get(verifyUser, quotationController.getAllQuotations)
+    .post(verifyUser, quotationController.postQuotationForm)
+    .put(verifyUser, quotationController.updateQuotationForm)
+    .delete(verifyUser, quotationController.deleteQuotation)
 
 //* predefined data of quotation Start
 
 // water Test report source (WTRS)
 router.route('/water-test-report-source')
-    .get(verifyUser, getAllValue)
-    .post(verifyUser, addSingleValue)
-    .put(verifyUser, editSingleValue)
-    .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllValue)
+    .post(verifyUser, predefinedDataController.addSingleValue)
+    .put(verifyUser, predefinedDataController.editSingleValue)
+    .delete(verifyUser, predefinedDataController.deleteSingleValue)   // ?id=  pass id with query
 
 // Work site - home type
 router.route('/work-sites')
-    .get(verifyUser, getAllValue)
-    .post(verifyUser, addSingleValue)
-    .put(verifyUser, editSingleValue)
-    .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllValue)
+    .post(verifyUser, predefinedDataController.addSingleValue)
+    .put(verifyUser, predefinedDataController.editSingleValue)
+    .delete(verifyUser, predefinedDataController.deleteSingleValue)   // ?id=  pass id with query
 
 // Water usage types
 router.route('/water-usage')
-    .get(verifyUser, getAllValue)
-    .post(verifyUser, addSingleValue)
-    .put(verifyUser, editSingleValue)
-    .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllValue)
+    .post(verifyUser, predefinedDataController.addSingleValue)
+    .put(verifyUser, predefinedDataController.editSingleValue)
+    .delete(verifyUser, predefinedDataController.deleteSingleValue)   // ?id=  pass id with query
 
 // Installation mode
 router.route('/installation-mode')
-    .get(verifyUser, getAllValue)
-    .post(verifyUser, addSingleValue)
-    .put(verifyUser, editSingleValue)
-    .delete(verifyUser, deleteSingleValue)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllValue)
+    .post(verifyUser, predefinedDataController.addSingleValue)
+    .put(verifyUser, predefinedDataController.editSingleValue)
+    .delete(verifyUser, predefinedDataController.deleteSingleValue)   // ?id=  pass id with query
 
 
 // Purifier Solution Model
 router.route('/purifier-solution-model')
-    .get(verifyUser, getAllSolutionModel)
-    .post(verifyUser, addSolutionModel)
-    .put(verifyUser, editSolutionModel)
-    .delete(verifyUser, deleteSolutionModel)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllSolutionModel)
+    .post(verifyUser, predefinedDataController.addSolutionModel)
+    .put(verifyUser, predefinedDataController.editSolutionModel)
+    .delete(verifyUser, predefinedDataController.deleteSolutionModel)   // ?id=  pass id with query
 
 // Purifier Components
 router.route('/purifier-component')
-    .get(verifyUser, getAllComponents)
-    .post(verifyUser, addComponents)
-    .put(verifyUser, editComponents)
-    .delete(verifyUser, deleteComponents)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllComponents)
+    .post(verifyUser, predefinedDataController.addComponents)
+    .put(verifyUser, predefinedDataController.editComponents)
+    .delete(verifyUser, predefinedDataController.deleteComponents)   // ?id=  pass id with query
 
 
 // Whole House Solution Model
 router.route('/wh-solution-model')
-    .get(verifyUser, getAllSolutionModel)
-    .post(verifyUser, addSolutionModel)
-    .put(verifyUser, editSolutionModel)
-    .delete(verifyUser, deleteSolutionModel)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllSolutionModel)
+    .post(verifyUser, predefinedDataController.addSolutionModel)
+    .put(verifyUser, predefinedDataController.editSolutionModel)
+    .delete(verifyUser, predefinedDataController.deleteSolutionModel)   // ?id=  pass id with query
 
 // Purifier Components
 router.route('/vfs-component')
-    .get(verifyUser, getAllComponents)
-    .post(verifyUser, addComponents)
-    .put(verifyUser, editComponents)
-    .delete(verifyUser, deleteComponents)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllComponents)
+    .post(verifyUser, predefinedDataController.addComponents)
+    .put(verifyUser, predefinedDataController.editComponents)
+    .delete(verifyUser, predefinedDataController.deleteComponents)   // ?id=  pass id with query
 
 
 // Purifier Components
 router.route('/vfs-materials')
-    .get(verifyUser, getAllComponents)
-    .post(verifyUser, addComponents)
-    .put(verifyUser, editComponents)
-    .delete(verifyUser, deleteComponents)   // ?id=  pass id with query
+    .get(verifyUser, predefinedDataController.getAllComponents)
+    .post(verifyUser, predefinedDataController.addComponents)
+    .put(verifyUser, predefinedDataController.editComponents)
+    .delete(verifyUser, predefinedDataController.deleteComponents)   // ?id=  pass id with query
 
 
 //! predefined data of quotation End 

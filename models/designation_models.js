@@ -13,7 +13,11 @@ const designationSchema = new mongoose.Schema(
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'users',
             }
-        ]
+        ],
+        delete: {
+            type: Boolean,
+            default: false
+        }
     },
     {
         timestamps: true

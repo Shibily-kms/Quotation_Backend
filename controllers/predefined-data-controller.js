@@ -2,314 +2,348 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const PreDataQuotationModel = require('../models/quotation_resource_data')
 const { findCurrentDataType } = require('../helpers/helper-function')
-
+const { successResponse, errorResponse } = require('../helpers/response-helper')
 
 // Single Value CRUD
-const addSingleValue = async (req, res) => {
+const addSingleValue = async (req, res, next) => {
 
     try {
-        const title = findCurrentDataType(req.originalUrl)
-
         const { item } = req.body
-        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
-
-        if (!data && item) {
-            PreDataQuotationModel.findOneAndUpdate({ title }, {
-                $push: {
-                    data: { item: item }
-                }
-            }, {
-                upsert: true, new: true
-            }).then((response) => {
-                const newAddedValue = response.data[response.data.length - 1]; // Retrieve the last added value
-                res.status(201).json({ status: true, newValue: newAddedValue, message: 'new data added' })
-            })
-        } else {
-            data && res.status(400).json({ status: false, message: 'This already existed' })
-            !item && res.status(400).json({ status: false, message: 'All Field Required' })
+        if (!item) {
+            return res.status(409).json(errorResponse('Request body is missing', 409))
         }
 
+        const title = findCurrentDataType(req.originalUrl)
+        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
+
+        if (data) {
+            return res.status(400).json(errorResponse('This already exists'))
+        }
+
+        const preData = await PreDataQuotationModel.findOneAndUpdate({ title }, {
+            $push: { data: { item: item } }
+        }, { upsert: true, new: true })
+
+        const nowAdded = preData.data[preData.data.length - 1]; // Retrieve the last added value
+        res.status(201).json(successResponse('New data added', nowAdded))
+
     } catch (error) {
-        throw error;
+        next(error)
     }
 }
 
-const getAllValue = (req, res) => {
+const getAllValue = async (req, res, next) => {
     try {
-        const title = findCurrentDataType(req.originalUrl)
-        PreDataQuotationModel.findOne({ title }).then((data) => {
-            res.status(201).json({ status: true, source: data, message: 'All items' })
-        })
+        const title = findCurrentDataType(req.originalUrl);
+        const allData = await PreDataQuotationModel.findOne({ title })
+        res.status(201).json(successResponse('All items', allData))
+
     } catch (error) {
-        throw error;
+        next(error)
     }
 }
 
 const editSingleValue = async (req, res) => {
     try {
-        const title = findCurrentDataType(req.originalUrl)
         const { _id, item } = req.body
+        if (!_id || !item) {
+            return res.status(409).json(errorResponse('Request body is missing', 409))
+        }
+
+        const title = findCurrentDataType(req.originalUrl)
         const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
-
-        if (!data && item) {
-            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(_id) }, {
-                $set: {
-                    'data.$.item': item
-                }
-            }).then(() => {
-                res.status(201).json({ status: true, message: 'Updated' })
-            })
-        } else {
-            data && res.status(400).json({ status: false, message: 'This already existed' })
-            !item && res.status(400).json({ status: false, message: 'All Field Required' })
-        }
-    } catch (error) {
-        throw error;
-    }
-}
-
-const deleteSingleValue = (req, res) => {
-    try {
-        const title = findCurrentDataType(req.originalUrl)
-        const { id } = req.query
-
-        if (id) {
-            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(id) }, {
-                $pull: {
-                    data: {
-                        _id: new ObjectId(id)
-                    }
-                }
-            }).then(() => {
-                res.status(201).json({ status: true, message: 'Removed' })
-            })
-        } else {
-            res.status(400).json({ status: false, message: 'Pass id with query' })
-        }
-    } catch (error) {
-        throw error;
-    }
-}
-
-// Soluction's Models
-
-const addSolutionModel = async (req, res) => {
-
-    try {
-        const title = findCurrentDataType(req.originalUrl)
-
-        const { item, price } = req.body
-        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
-
-        if (!data && item && price) {
-            PreDataQuotationModel.findOneAndUpdate({ title }, {
-                $push: {
-                    data: { item, price: Number(price) }
-                }
-            }, {
-                upsert: true, new: true
-            }).then((response) => {
-                const newAddedValue = response.data[response.data.length - 1]; // Retrieve the last added value
-                res.status(201).json({ status: true, newValue: newAddedValue, message: 'new data added' })
-            })
-        } else {
-            data && res.status(400).json({ status: false, message: 'This already existed' })
-            !item || !price ? res.status(400).json({ status: false, message: 'All Field Required' }) : ''
+        if (data) {
+            return res.status(400).json(errorResponse('This already exists'))
         }
 
-    } catch (error) {
-        throw error;
-    }
-}
-
-const getAllSolutionModel = (req, res) => {
-    try {
-        const title = findCurrentDataType(req.originalUrl)
-        PreDataQuotationModel.findOne({ title }).then((data) => {
-            res.status(201).json({ status: true, items: data, message: 'All items' })
+        const result = await PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(_id) }, {
+            $set: {
+                'data.$.item': item
+            }
         })
+
+        if (!result.modifiedCount) {
+            return res.status(400).json(errorResponse('Invalid item'))
+        }
+
+        res.status(201).json(successResponse('Updated'))
+
     } catch (error) {
-        throw error;
+        next(error)
+    }
+}
+
+const deleteSingleValue = async (req, res, next) => {
+    try {
+        const { id } = req.query
+        if (!id) {
+            return res.status(409).json(errorResponse('Request query is missing', 409))
+        }
+
+        const title = findCurrentDataType(req.originalUrl)
+        const result = await PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(id) }, {
+            $pull: {
+                data: {
+                    _id: new ObjectId(id)
+                }
+            }
+        })
+
+        if (!result.modifiedCount) {
+            return res.status(400).json(errorResponse('Invalid item'))
+        }
+
+        res.status(201).json(successResponse('Removed'))
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+// solution's Models
+
+const addSolutionModel = async (req, res, next) => {
+
+    try {
+        const { item, price } = req.body
+        if (!item || !price) {
+            return res.status(409).json(errorResponse('Request body is missing', 409))
+        }
+
+        const title = findCurrentDataType(req.originalUrl)
+        const data = await PreDataQuotationModel.findOne({ title, 'data.item': item })
+        if (data) {
+            return res.status(400).json(errorResponse('This already exists'))
+        }
+
+        const preData = await PreDataQuotationModel.findOneAndUpdate({ title }, {
+            $push: {
+                data: { item, price: Number(price) }
+            }
+        }, {
+            upsert: true, new: true
+        })
+
+        const newAddedValue = preData.data[preData.data.length - 1]; // Retrieve the last added value
+        res.status(201).json(successResponse('New data added', newAddedValue))
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+const getAllSolutionModel = async (req, res, next) => {
+    try {
+        const title = findCurrentDataType(req.originalUrl)
+        const allData = await PreDataQuotationModel.findOne({ title })
+        res.status(201).json(successResponse('All items', allData))
+    } catch (error) {
+        next(error)
     }
 }
 
 const editSolutionModel = async (req, res) => {
     try {
-        const title = findCurrentDataType(req.originalUrl)
         const { _id, item, price } = req.body
+        if (!_id || !item || !price) {
+            return res.status(409).json(errorResponse('Request body is missing', 409))
+        }
+
+        const title = findCurrentDataType(req.originalUrl)
         let data = await PreDataQuotationModel.findOne({ title, 'data.item': item }, { data: { $elemMatch: { item: item } } })
         data = data?.data?.[0]?._id == _id ? null : data
-
-
-        if (!data && item && price) {
-            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(_id) }, {
-                $set: {
-                    'data.$.item': item,
-                    'data.$.price': Number(price)
-                }
-            }).then(() => {
-                res.status(201).json({ status: true, message: 'Updated' })
-            })
-        } else {
-            data && res.status(400).json({ status: false, message: 'This already existed' })
-            !item || !price ? res.status(400).json({ status: false, message: 'All Field Required' }) : ''
+        if (data) {
+            return res.status(400).json(errorResponse('This already exists'))
         }
+
+        const result = await PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(_id) }, {
+            $set: {
+                'data.$.item': item,
+                'data.$.price': Number(price)
+            }
+        })
+        if (!result.modifiedCount) {
+            return res.status(400).json(errorResponse('Invalid item'))
+        }
+
+        res.status(201).json(successResponse('Updated'))
+
     } catch (error) {
-        throw error;
+        next(error)
     }
 }
 
-const deleteSolutionModel = (req, res) => {
+const deleteSolutionModel = async (req, res, next) => {
     try {
-        const title = findCurrentDataType(req.originalUrl)
         const { id } = req.query
-
-        if (id) {
-            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(id) }, {
-                $pull: {
-                    data: {
-                        _id: new ObjectId(id)
-                    }
-                }
-            }).then(() => {
-                res.status(201).json({ status: true, message: 'Removed' })
-            })
-        } else {
-            res.status(400).json({ status: false, message: 'Pass id with query' })
+        if (!id) {
+            return res.status(409).json(errorResponse('Request query is missing', 409))
         }
+
+        const title = findCurrentDataType(req.originalUrl)
+        const result = await PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(id) }, {
+            $pull: {
+                data: {
+                    _id: new ObjectId(id)
+                }
+            }
+        })
+        if (!result.modifiedCount) {
+            return res.status(400).json(errorResponse('Invalid item'))
+        }
+
+        res.status(201).json(successResponse('Removed'))
+
     } catch (error) {
-        throw error;
+        next(error)
     }
 }
 
 
 // Purifier Components
 
-const addComponents = async (req, res) => {
+const addComponents = async (req, res, next) => {
 
     try {
-        const title = findCurrentDataType(req.originalUrl)
-
         const { name, brand } = req.body
+        if (!name || !brand) {
+            return res.status(409).json(errorResponse('Request body is missing', 409))
+        }
+
+        const title = findCurrentDataType(req.originalUrl)
         let data = await PreDataQuotationModel.findOne({ title, 'data.item': name, 'data.brands.brand': brand },
             { data: { $elemMatch: { item: name, brands: { $elemMatch: { brand } } } } })
         data = data?.data.length === 0 ? null : data
 
-        if (!data && name && brand) {
-            let check = await PreDataQuotationModel.findOne({ title, 'data.item': name })
-            if (check) {
-                PreDataQuotationModel.findOneAndUpdate({ title, 'data.item': name }, {
-                    $push: {
-                        'data.$.brands': { brand }
-                    }
-                }, {
-                    upsert: true, new: true
-                }).then((response) => {
-                    const newAddedValue = response.data.filter((obj) => obj.item === name).map((obj) => {
-                        return {
-                            item: obj.item,
-                            _id: obj._id,
-                            brands: obj.brands.filter((obj2) => obj2.brand === brand)
-                        }
-                    });
-                    res.status(201).json({ status: true, newValue: newAddedValue[0], message: 'new data added' })
-                })
-            } else {
-                PreDataQuotationModel.findOneAndUpdate({ title }, {
-                    $push: {
-                        data: {
-                            item: name,
-                            brands: [{ brand }]
-                        }
-                    }
-                }, {
-                    upsert: true, new: true
-                }).then((response) => {
-                    const newAddedValue = response.data.filter((obj) => obj.item === name).map((obj) => {
-                        return {
-                            item: obj.item,
-                            _id: obj._id,
-                            brands: obj.brands.filter((obj2) => obj2.brand === brand)
-                        }
-                    });
-                    res.status(201).json({ status: true, newValue: newAddedValue[0], message: 'new data added' })
-                })
-            }
-        } else {
+        if (data) {
+            return res.status(400).json(errorResponse('This already exists'))
+        }
 
-            data && res.status(400).json({ status: false, message: 'This already existed' })
-            !name || !brand ? res.status(400).json({ status: false, message: 'All Field Required' }) : ''
+        const check = await PreDataQuotationModel.findOne({ title, 'data.item': name })
+        if (check) {
+            const addOnlyBrand = await PreDataQuotationModel.findOneAndUpdate({ title, 'data.item': name }, {
+                $push: {
+                    'data.$.brands': { brand }
+                }
+            }, {
+                upsert: true, new: true
+            })
+            const newAddedValue = addOnlyBrand.data.filter((obj) => obj.item === name).map((obj) => {
+                return {
+                    item: obj.item,
+                    _id: obj._id,
+                    brands: obj.brands.filter((obj2) => obj2.brand === brand)
+                }
+            });
+
+            return res.status(201).json(successResponse('New data added', newAddedValue[0]))
+
+        } else {
+            const addWithItem = await PreDataQuotationModel.findOneAndUpdate({ title }, {
+                $push: {
+                    data: {
+                        item: name,
+                        brands: [{ brand }]
+                    }
+                }
+            }, {
+                upsert: true, new: true
+            })
+
+            const newAddedValue = addWithItem.data.filter((obj) => obj.item === name).map((obj) => {
+                return {
+                    item: obj.item,
+                    _id: obj._id,
+                    brands: obj.brands.filter((obj2) => obj2.brand === brand)
+                }
+            });
+
+            return res.status(201).json(successResponse('New data added', newAddedValue[0]))
         }
 
     } catch (error) {
-        throw error;
+        next(error)
     }
 }
 
-const getAllComponents = (req, res) => {
+const getAllComponents = async (req, res, next) => {
     try {
         const title = findCurrentDataType(req.originalUrl)
-        PreDataQuotationModel.findOne({ title }).then((data) => {
-            res.status(201).json({ status: true, items: data, message: 'All items' })
-        })
+        const allData = await PreDataQuotationModel.findOne({ title })
+        res.status(201).json(successResponse('All items', allData))
     } catch (error) {
-        throw error;
+        next(error)
     }
 }
 
 const editComponents = async (req, res) => {
     try {
-        const title = findCurrentDataType(req.originalUrl)
         const { nameId, brandId, name, brand } = req.body
+        if (!nameId || !brandId || !name || !brand) {
+            return res.status(409).json(errorResponse('Request body is missing', 409))
+        }
 
+        const title = findCurrentDataType(req.originalUrl)
         let data = await PreDataQuotationModel.findOne({ title, 'data.item': name, 'data.brands.brand': brand },
             { data: { $elemMatch: { item: name, brands: { $elemMatch: { brand } } } } })
         data = data?.data.length === 0 ? null : data
 
-        if (!data && name && brand) {
-            PreDataQuotationModel.updateMany({ title, 'data._id': new ObjectId(nameId), 'data.brands._id': new ObjectId(brandId) }, {
-                $set: {
-                    'data.$[dataElem].brands.$[brandElem].brand': brand
-                }
-            }, {
-                arrayFilters: [
-                    { 'dataElem._id': new ObjectId(nameId) },
-                    { 'brandElem._id': new ObjectId(brandId) }
-                ]
-            }).then(() => {
-                res.status(201).json({ status: true, message: 'Updated' })
-            })
-        } else {
-            data && res.status(400).json({ status: false, message: 'This already existed' })
-            !name || !brand ? res.status(400).json({ status: false, message: 'All Field Required' }) : ''
+        if (data) {
+            return res.status(400).json(errorResponse('This already exists'))
         }
+
+        const result = await PreDataQuotationModel.updateMany({ title, 'data._id': new ObjectId(nameId), 'data.brands._id': new ObjectId(brandId) }, {
+            $set: {
+                'data.$[dataElem].brands.$[brandElem].brand': brand
+            }
+        }, {
+            arrayFilters: [
+                { 'dataElem._id': new ObjectId(nameId) },
+                { 'brandElem._id': new ObjectId(brandId) }
+            ]
+        })
+
+        if (!result.modifiedCount) {
+            return res.status(400).json(errorResponse('Invalid item'))
+        }
+
+        res.status(201).json(successResponse('Updated'))
+
     } catch (error) {
-        throw error;
+        next(error)
     }
 }
 
-const deleteComponents = (req, res) => {
+const deleteComponents = async (req, res, next) => {
     try {
-        const title = findCurrentDataType(req.originalUrl)
         const { nameId, brandId } = req.query
-
-        if (nameId && brandId) {
-            PreDataQuotationModel.updateOne({ title, 'data._id': new ObjectId(nameId), 'data.brands._id': new ObjectId(brandId) }, {
-                $pull: {
-                    'data.$[dataElem].brands': { _id: new ObjectId(brandId) }
-                }
-            }, {
-                arrayFilters: [
-                    { 'dataElem._id': new ObjectId(nameId) }
-                ]
-            }).then(() => {
-                res.status(201).json({ status: true, message: 'Removed' })
-            })
-        } else {
-            res.status(400).json({ status: false, message: 'Pass id with query' })
+        if (!nameId || !brandId) {
+            return res.status(409).json(errorResponse('Request query is missing', 409))
         }
+
+        const title = findCurrentDataType(req.originalUrl)
+        const result = await PreDataQuotationModel.updateOne({
+            title, 'data._id': new ObjectId(nameId),
+            'data.brands._id': new ObjectId(brandId)
+        }, {
+            $pull: {
+                'data.$[dataElem].brands': { _id: new ObjectId(brandId) }
+            }
+        }, {
+            arrayFilters: [
+                { 'dataElem._id': new ObjectId(nameId) }
+            ]
+        })
+
+        if (!result.modifiedCount) {
+            return res.status(400).json(errorResponse('Invalid item'))
+        }
+
+        res.status(201).json(successResponse('Removed'))
+
+
     } catch (error) {
-        throw error;
+        next(error)
     }
 }
 

@@ -27,6 +27,10 @@ const staffSchema = new mongoose.Schema(
         password: {
             type: String,
             required: true
+        },
+        delete: {
+            type: Boolean,
+            default: false
         }
     },
     {
