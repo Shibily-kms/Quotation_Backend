@@ -12,7 +12,7 @@ router.get('/user-verify/:userId', authController.userVerifyForSales)
 
 // Quotation Inputs
 router.route('/quotation')
-    .get(verifyUser, quotationController.getAllQuotations)
+    .get(verifyUser, quotationController.getQuotations)
     .post(verifyUser, quotationController.postQuotationForm)
     .put(verifyUser, quotationController.updateQuotationForm)
     .delete(verifyUser, quotationController.deleteQuotation)

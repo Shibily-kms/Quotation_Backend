@@ -17,12 +17,12 @@ const quotationInputSchema = new mongoose.Schema(
             mobile: String
         },
         test_report: {
-            type_of : String,
+            type_of: String,
             source: String,
-            tds: Number,
-            ph: Number,
-            fe: Number,
-            ca: Number
+            tds: String,
+            ph: String,
+            fe: String,
+            ca: String
         },
         findings: [{ text: String }],
         pws_report: {
