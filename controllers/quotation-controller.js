@@ -11,7 +11,6 @@ const postQuotationForm = async (req, res, next) => {
 
         const verifyInputs = verifyQuotationInputs(req.body)
         if (!verifyInputs.status) {
-            console.log(verifyInputs);
             return res.status(401).json(errorResponse(verifyInputs.message, 401))
         }
 
@@ -41,7 +40,6 @@ const postQuotationForm = async (req, res, next) => {
         if (error.name === 'UnknownEndpoint') {
             return res.status(400).json(errorResponse('No proper internet connection', 400))
         } else {
-            console.log(error);
             next(error)
         }
     }
