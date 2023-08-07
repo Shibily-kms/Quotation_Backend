@@ -18,8 +18,8 @@ const userVerifyForSales = async (req, res, next) => {
             return res.status(401).json(errorResponse('Invalid user Id', 401))
         }
 
-        const designation_details = await DesignationModel.findById({ _id: user.designation })
-        if (!designation_details._doc.allow_sales) {
+        const designation_details = await DesignationModel.findById({ _id: user.designation }, { delete: 0, name: 0, updatedAt: 0, __v: 0, createdAt: 0 })
+        if (!designation_details._doc.allow_origins.includes('Sales')) {
             return res.status(401).json(errorResponse('Sales access denied', 401))
         }
 
@@ -31,11 +31,7 @@ const userVerifyForSales = async (req, res, next) => {
         delete user._doc.updatedAt
         delete user._doc.__v
         user._doc.token = token
-        user._doc.designation = {
-            id: designation_details._id,
-            designation: designation_details.designation,
-            allow_sales: designation_details.allow_sales || false
-        }
+        user._doc.designation = designation_details
         res.status(201).json(successResponse('User login success', user))
 
     } catch (error) {

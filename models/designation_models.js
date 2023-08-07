@@ -6,7 +6,7 @@ const designationSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        allow_sales: Boolean,
+        allow_origins: [],
         auto_punch_out : String,
         name: [
             {
