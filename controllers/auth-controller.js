@@ -19,7 +19,8 @@ const userVerifyForSales = async (req, res, next) => {
         }
 
         const designation_details = await DesignationModel.findById({ _id: user.designation }, { delete: 0, name: 0, updatedAt: 0, __v: 0, createdAt: 0 })
-        if (!designation_details._doc.allow_origins.includes('Sales')) {
+        if (!designation_details._doc.allow_origins.includes('Sales') &&
+            !designation_details._doc.allow_origins.includes('SalesPro')) {
             return res.status(401).json(errorResponse('Sales access denied', 401))
         }
 
