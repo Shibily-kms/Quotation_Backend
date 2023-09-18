@@ -1,11 +1,12 @@
 const express = require('express')
 const router = express.Router();
-
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const { verifyUser } = require('../middleware/verify-middleware');
 const authController = require('../controllers/auth-controller')
 const predefinedDataController = require('../controllers/predefined-data-controller');
 const quotationController = require('../controllers/quotation-controller')
-
+const WorkModel = require('../models/work-data')
 
 // Auto SignUp
 router.get('/user-verify/:userId', authController.userVerifyForSales)
@@ -87,5 +88,47 @@ router.route('/vfs-materials')
 
 
 //! predefined data of quotation End 
+
+
+// Test
+router.get('/test/stage-one', async (req, res, next) => {
+    try {
+        const data = await WorkModel.find().limit(10)
+        res.status(201).json({ data })
+    } catch (error) {
+        res.status(400).json({ error })
+    }
+})
+
+router.get('/test/stage-two', async (req, res, next) => {
+    try {
+        const data = await WorkModel.findOne()
+        res.status(201).json({ data })
+    } catch (error) {
+        res.status(400).json({ error })
+    }
+})
+
+router.get('/test/stage-three', async (req, res, next) => {
+    try {
+        const data = await WorkModel.findOne({}, { name: 1 })
+        res.status(201).json({ data })
+    } catch (error) {
+        res.status(400).json({ error })
+    }
+})
+
+router.get('/test/stage-four', async (req, res, next) => {
+    try {
+        const { id } = req.query
+        if (!id) {
+            return res.status(400).json({ message: 'no id' })
+        }
+        const data = await WorkModel.findOne({ _id: new ObjectId(id) })
+        res.status(201).json({ data })
+    } catch (error) {
+        res.status(400).json({ error })
+    }
+})
 
 module.exports = router;
