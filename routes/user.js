@@ -131,4 +131,18 @@ router.get('/test/stage-four', async (req, res, next) => {
     }
 })
 
+router.get('/test/stage-five', async (req, res, next) => {
+    try {
+        const { cid } = req.query
+        if (!cid) {
+            return res.status(400).json({ message: 'no id' })
+        }
+        const data = await WorkModel.findOne({ cid })
+        res.status(201).json({ data })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ error })
+    }
+})
+
 module.exports = router;
