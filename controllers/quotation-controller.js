@@ -92,7 +92,7 @@ const getQuotations = async (req, res, next) => {
         if (id) {
             data = await QuotationInputModel.findOne({ _id: new ObjectId(id) })
         } else {
-            data = await QuotationInputModel.find({}, { quotation_srl_no: 1, type: 1, enquiry_srl_no: 1, customer: 1 })
+            data = await QuotationInputModel.find({}, { quotation_srl_no: 1, type: 1, enquiry_srl_no: 1, customer: 1 }).sort({ _id: -1 })
         }
         res.status(201).json(successResponse('All quotations', data))
 
