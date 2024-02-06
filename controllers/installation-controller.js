@@ -13,7 +13,7 @@ const { YYYYMMDDFormat } = require('../helpers/date-formate');
 const doInstall = async (req, res, next) => {
     try {
         const { cid } = req.body
-        console.log(req.body)
+   
         if (!cid) {
             return res.status(409).json(errorResponse('Request body is missing', 409))
         }
@@ -121,12 +121,10 @@ const doInstall = async (req, res, next) => {
             condition_sign: req.body.sign
         }
         const addInstallationData = await InstallationModel.create(inDb)
-        console.log(addInstallationData)
 
         res.status(201).json(successResponse('Installation form Submitted'))
 
     } catch (error) {
-        console.log(error)
         next(error)
     }
 }
@@ -231,7 +229,6 @@ const doReInstall = async (req, res, next) => {
         res.status(201).json(successResponse('ReInstallation form Submitted'))
 
     } catch (error) {
-        console.log(error)
         next(error)
     }
 }
