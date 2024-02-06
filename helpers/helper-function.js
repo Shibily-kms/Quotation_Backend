@@ -64,4 +64,22 @@ function createQuotationId(type, ISOdate, index) {
 }
 
 
-module.exports = { findCurrentDataType, createQuotationId }
+const customerStatusInSmall = (status) => {
+    switch (status) {
+        case 'I/W':
+            return 'iw'
+        case 'O/W':
+            return 'ow'
+        case 'O/C':
+            return 'oc'
+        case 'AMC':
+            return 'amc'
+        case 'SSP':
+            return 'ssp'
+        default:
+            break;
+    }
+}
+
+
+module.exports = { findCurrentDataType, createQuotationId, customerStatusInSmall }
