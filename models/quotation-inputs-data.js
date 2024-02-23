@@ -41,10 +41,12 @@ const quotationInputSchema = new mongoose.Schema(
             floor_hight: Number,
             inlet: Number,
             outlet: Number,
-            bathroom_in_top: Number
+            bathroom_in_top: Number,
+            basement: Boolean
         },
-        preferred_solution: [{ item: String, price: Number }],
-        cust_preferred_solution: [{ item: String, price: Number }],
+        preferred_solution: [{ item: String, price: Number, qty: Number }],
+        cust_preferred_solution: [{ item: String, price: Number, qty: Number }],
+        gst_include: Boolean,
         warranty: { pws: String, vfs: String },
         materials: [{ item: String, brand: String }],
         vfs_component: [{ item: String, brand: String }],
@@ -55,7 +57,19 @@ const quotationInputSchema = new mongoose.Schema(
         expr_date: String,
         ps_total: Number,
         css_total: Number,
-        sign: { customer: {} }
+        sign: { customer: {} },
+        created_by: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'staff_datas',
+            }
+        ],
+        updated_by: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'staff_datas',
+            }
+        ],
     },
     {
         timestamps: true

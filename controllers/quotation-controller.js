@@ -8,7 +8,6 @@ const { successResponse, errorResponse } = require('../helpers/response-helper')
 
 const postQuotationForm = async (req, res, next) => {
     try {
-
         const verifyInputs = verifyQuotationInputs(req.body)
         if (!verifyInputs.status) {
             return res.status(401).json(errorResponse(verifyInputs.message, 401))
@@ -21,14 +20,15 @@ const postQuotationForm = async (req, res, next) => {
 
         //index
         req.body.index = lastData[lastData.length - 1]?.index ? lastData[lastData.length - 1]?.index + 1 : 1
+        req.body.created_by = new ObjectId(req.user.id)
 
         // Quotation srl number
         req.body.quotation_srl_no = createQuotationId(req.body.type, new Date(), (req.body.index))
 
         // Save Signature in Folder
         if (req.body?.sign?.customer?.url) {
-            let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
-            req.body.sign = { customer }
+            // let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
+            req.body.sign = null
         }
 
         // Upload to DB
@@ -50,8 +50,8 @@ const updateQuotationForm = async (req, res, next) => {
 
         // Save Signature in Folder
         if (req.body?.sign?.customer?.url && !req.body?.sign?.customer?.key) {
-            const customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
-            req.body.sign = { customer }
+            // const customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
+            req.body.sign = null
         }
         await QuotationInputModel.updateOne({ _id: new ObjectId(req.body._id) }, {
             $set: {
@@ -62,6 +62,7 @@ const updateQuotationForm = async (req, res, next) => {
                 findings: req.body.findings,
                 pws_report: req.body.pws_report,
                 vfs_report: req.body.vfs_report,
+                gst_include: req.body.gst_include,
                 preferred_solution: req.body.preferred_solution,
                 cust_preferred_solution: req.body.cust_preferred_solution,
                 warranty: req.body.warranty,
@@ -74,7 +75,8 @@ const updateQuotationForm = async (req, res, next) => {
                 expr_date: req.body.expr_date,
                 ps_total: req.body.ps_total,
                 css_total: req.body.css_total,
-                sign: req.body.sign
+                sign: req.body.sign,
+                updated_by: new ObjectId(req.user.id)
             }
         })
 
