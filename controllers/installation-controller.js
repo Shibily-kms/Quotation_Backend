@@ -13,7 +13,7 @@ const { YYYYMMDDFormat } = require('../helpers/date-formate');
 const doInstall = async (req, res, next) => {
     try {
         const { cid } = req.body
-   
+
         if (!cid) {
             return res.status(409).json(errorResponse('Request body is missing', 409))
         }
@@ -90,9 +90,9 @@ const doInstall = async (req, res, next) => {
 
         // Upload Signature
         if (req.body?.signature?.url) {
-            // let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
+            let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
             req.body.sign = {
-                // ...customer,
+                ...customer,
                 name: req.body.customer_name
             }
         } else {
@@ -193,9 +193,9 @@ const doReInstall = async (req, res, next) => {
 
         // Upload Signature
         if (req.body?.signature?.url) {
-            // let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
+            let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
             req.body.sign = {
-                // ...customer,
+                ...customer,
                 name: req.body.customer_name
             }
         } else {

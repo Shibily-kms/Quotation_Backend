@@ -27,8 +27,8 @@ const postQuotationForm = async (req, res, next) => {
 
         // Save Signature in Folder
         if (req.body?.sign?.customer?.url) {
-            // let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
-            req.body.sign = null
+            let customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
+            req.body.sign = { customer }
         }
 
         // Upload to DB
@@ -50,8 +50,8 @@ const updateQuotationForm = async (req, res, next) => {
 
         // Save Signature in Folder
         if (req.body?.sign?.customer?.url && !req.body?.sign?.customer?.key) {
-            // const customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
-            req.body.sign = null
+            const customer = await uploadSignature(req.body.sign.customer.url, req.body.quotation_srl_no, 'customer')
+            req.body.sign = { customer }
         }
         await QuotationInputModel.updateOne({ _id: new ObjectId(req.body._id) }, {
             $set: {
