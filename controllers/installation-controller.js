@@ -7,6 +7,7 @@ const { createInstallationSrlNumber, createPackageId, createReInstallationSrlNum
 const { customerStatusInSmall } = require('../helpers/helper-function')
 const { successResponse, errorResponse } = require('../helpers/response-helper');
 const { YYYYMMDDFormat } = require('../helpers/date-formate');
+const { uploadSignature } = require('../helpers/upload-image')
 
 
 
@@ -193,7 +194,7 @@ const doReInstall = async (req, res, next) => {
 
         // Upload Signature
         if (req.body?.signature?.url) {
-            let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
+            let customer = await uploadSignature(req.body?.signature?.url, `I${reinstallationSrl[0]}`)
             req.body.sign = {
                 ...customer,
                 name: req.body.customer_name
