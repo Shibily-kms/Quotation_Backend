@@ -12,9 +12,9 @@ const { YYYYMMDDFormat } = require('../helpers/date-formate');
 
 const doInstall = async (req, res, next) => {
     try {
-        const { cid } = req.body
-   
-        if (!cid) {
+        const { cid, installed_at } = req.body
+
+        if (!cid || !installed_at) {
             return res.status(409).json(errorResponse('Request body is missing', 409))
         }
 
@@ -35,15 +35,15 @@ const doInstall = async (req, res, next) => {
                 "purifier_details.product_id": req.body.purifier_id,
                 "purifier_details.product_usage": req.body.purifier_usage,
                 "purifier_details.installed_by": new ObjectId(req.user.id),
-                "purifier_details.installed_at": YYYYMMDDFormat(new Date()),
+                "purifier_details.installed_at": installed_at,
                 "purifier_details.installation_srl_no": `I${installationSrl[0]}`,
-                "purifier_details.next_periodical_service_date": YYYYMMDDFormat(new Date(new Date().setMonth(new Date().getMonth() + 3))),
-                "purifier_details.technician_last_visited_date": YYYYMMDDFormat(new Date()),
+                "purifier_details.next_periodical_service_date": YYYYMMDDFormat(new Date(new Date(installed_at).setMonth(new Date(installed_at).getMonth() + 3))),
+                "purifier_details.technician_last_visited_date": installed_at,
                 "purifier_details.package_id": await createPackageId(customerStatusInSmall('I/W')),
-                "purifier_details.package_started_date": YYYYMMDDFormat(new Date()),
-                "purifier_details.package_expiry_date": YYYYMMDDFormat(new Date(new Date().setFullYear(new Date().getFullYear() + 1))),
-                "purifier_details.carbon_filter_start_date": YYYYMMDDFormat(new Date()),
-                "purifier_details.carbon_filter_expiry_date": YYYYMMDDFormat(new Date(new Date().setFullYear(new Date().getFullYear() + 1))),
+                "purifier_details.package_started_date": installed_at,
+                "purifier_details.package_expiry_date": YYYYMMDDFormat(new Date(new Date(installed_at).setFullYear(new Date(installed_at).getFullYear() + 1))),
+                "purifier_details.carbon_filter_start_date": installed_at,
+                "purifier_details.carbon_filter_expiry_date": YYYYMMDDFormat(new Date(new Date(installed_at).setFullYear(new Date(installed_at).getFullYear() + 1))),
                 "purifier_details.creation_type": 'NEW MACHINE',
 
             }
@@ -56,12 +56,12 @@ const doInstall = async (req, res, next) => {
                 wh_customer_status: 'I/W',
                 "whole_house_details.product_id": req.body.wh_id,
                 "whole_house_details.installed_by": new ObjectId(req.user.id),
-                "whole_house_details.installed_at": YYYYMMDDFormat(new Date()),
+                "whole_house_details.installed_at": installed_at,
                 "whole_house_details.installation_srl_no": `I${installationSrl[0]}`,
-                "whole_house_details.technician_last_visited_date": YYYYMMDDFormat(new Date()),
+                "whole_house_details.technician_last_visited_date": installed_at,
                 "whole_house_details.package_id": await createPackageId(customerStatusInSmall('I/W')),
-                "whole_house_details.package_started_date": YYYYMMDDFormat(new Date()),
-                "whole_house_details.package_expiry_date": YYYYMMDDFormat(new Date(new Date().setFullYear(new Date().getFullYear() + 2))),
+                "whole_house_details.package_started_date": installed_at,
+                "whole_house_details.package_expiry_date": YYYYMMDDFormat(new Date(new Date(installed_at).setFullYear(new Date(installed_at).getFullYear() + 2))),
                 "whole_house_details.creation_type": 'NEW MACHINE',
 
             }
@@ -107,7 +107,7 @@ const doInstall = async (req, res, next) => {
             cid: req.body.cid,
             installation_srl_no: `I${installationSrl[0]}`,
             index: installationSrl[1],
-            date: YYYYMMDDFormat(new Date()),
+            date: installed_at,
             type_of_product: req.body.product === 'package' ? 'purifier_wh_package' : req.body.product,
             mode_of_installation: req.body.mode_of_installation,
             purifier_id: req.body.purifier_id ? new ObjectId(req.body.purifier_id) : undefined,
