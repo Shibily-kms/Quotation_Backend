@@ -7,7 +7,7 @@ const { createInstallationSrlNumber, createPackageId, createReInstallationSrlNum
 const { customerStatusInSmall } = require('../helpers/helper-function')
 const { successResponse, errorResponse } = require('../helpers/response-helper');
 const { YYYYMMDDFormat } = require('../helpers/date-formate');
-
+const { uploadSignature } = require('../helpers/upload-image')
 
 
 const doInstall = async (req, res, next) => {
