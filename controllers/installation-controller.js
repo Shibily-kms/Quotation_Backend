@@ -193,9 +193,9 @@ const doReInstall = async (req, res, next) => {
 
         // Upload Signature
         if (req.body?.signature?.url) {
-            // let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
+            let customer = await uploadSignature(req.body?.signature?.url, `RI${reinstallationSrl[0]}-test`)
             req.body.sign = {
-                // ...customer,
+                ...customer,
                 name: req.body.customer_name
             }
         } else {
