@@ -90,7 +90,7 @@ const doInstall = async (req, res, next) => {
 
         // Upload Signature
         if (req.body?.signature?.url) {
-            let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}-test`)
+            let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
             req.body.sign = {
                 ...customer,
                 name: req.body.customer_name
@@ -193,7 +193,7 @@ const doReInstall = async (req, res, next) => {
 
         // Upload Signature
         if (req.body?.signature?.url) {
-            let customer = await uploadSignature(req.body?.signature?.url, `RI${reinstallationSrl[0]}-test`)
+            let customer = await uploadSignature(req.body?.signature?.url, `RI${reinstallationSrl[0]}`)
             req.body.sign = {
                 ...customer,
                 name: req.body.customer_name
