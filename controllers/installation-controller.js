@@ -12,9 +12,10 @@ const { uploadSignature } = require('../helpers/upload-image')
 
 const doInstall = async (req, res, next) => {
     try {
-        const { cid } = req.body
-   
-        if (!cid) {
+        const { cid, installed_at } = req.body
+
+        // Check required elements
+        if (!cid || !installed_at ) {
             return res.status(409).json(errorResponse('Request body is missing', 409))
         }
 
