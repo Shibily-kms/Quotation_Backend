@@ -14,7 +14,8 @@ const doInstall = async (req, res, next) => {
     try {
         const { cid, installed_at } = req.body
 
-        if (!cid || !installed_at) {
+        // Check required elements
+        if (!cid || !installed_at ) {
             return res.status(409).json(errorResponse('Request body is missing', 409))
         }
 
