@@ -25,7 +25,7 @@ const doInstall = async (req, res, next) => {
         }
 
         let customerAdd = {}
-        let installationSrl = await createInstallationSrlNumber()
+        let installationSrl = await createInstallationSrlNumber(installed_at)
 
         if (req.body.product === 'package' || req.body.product === 'purifier') {
 
