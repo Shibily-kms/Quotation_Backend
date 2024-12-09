@@ -17,13 +17,13 @@ const findLastNumber = async (access_label) => {
     return newNumber
 }
 
-const createInstallationSrlNumber = async () => {
-    const todayServices = await InstallationModel.find({ date: YYYYMMDDFormat(new Date()) })
+const createInstallationSrlNumber = async (installed_at) => {
+    const todayServices = await InstallationModel.find({ date: YYYYMMDDFormat(new Date(installed_at)) })
     if (todayServices?.[0]) {
         const index = todayServices?.length + 1
-        return [`${YYYYMMDDFormat(new Date(), '')}${index}`, index]
+        return [`${YYYYMMDDFormat(new Date(installed_at), '')}${index}`, index]
     } else {
-        return [`${YYYYMMDDFormat(new Date(), '')}1`, 1]
+        return [`${YYYYMMDDFormat(new Date(installed_at), '')}1`, 1]
     }
 }
 
