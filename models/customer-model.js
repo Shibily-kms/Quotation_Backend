@@ -28,16 +28,19 @@ const customerSchema = new mongoose.Schema(
                 type: String
             },
             post: {
-                type: String
+                type: String   // old
+            },
+            city_id: {
+                type: Schema.Types.ObjectId
             },
             pin_code: {
                 type: String
             },
             district: {
-                type: String
+                type: String   // old
             },
             state: {
-                type: String
+                type: String   // old
             },
             land_mark: {
                 type: String
