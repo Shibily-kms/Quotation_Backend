@@ -70,21 +70,18 @@ const doInstall = async (req, res, next) => {
 
 
         // Update Customer Details
-        const updateCustomer = await CustomerModel.updateOne({ cid }, {
+        await CustomerModel.updateOne({ cid }, {
             $set: {
                 first_name: req.body.first_name,
                 last_name: req.body.last_name,
                 "address.address": req.body.address,
                 "address.place": req.body.place,
-                "address.post": req.body.post,
-                "address.pin_code": req.body.pin_code,
-                "address.district": req.body.district,
-                "address.state": req.body.state,
+                'address.pin_code': req.body.pin_code,
+                'address.city_id': req.body.city_id ? new ObjectId(req.body.city_id) : undefined,
                 "address.land_mark": req.body.land_mark,
                 'contact1.number': req.body.contact1,
                 'contact2.number': req.body.contact2,
                 'whatsapp1.number': req.body.whatsapp1,
-                zone: new ObjectId(req.body.zone_id),
                 ...customerAdd
             }
         })
@@ -179,15 +176,12 @@ const doReInstall = async (req, res, next) => {
                 last_name: req.body.last_name,
                 "address.address": req.body.address,
                 "address.place": req.body.place,
-                "address.post": req.body.post,
-                "address.pin_code": req.body.pin_code,
-                "address.district": req.body.district,
-                "address.state": req.body.state,
+                'address.pin_code': req.body.pin_code,
+                'address.city_id': req.body.city_id ? new ObjectId(req.body.city_id) : undefined,
                 "address.land_mark": req.body.land_mark,
                 'contact1.number': req.body.contact1,
                 'contact2.number': req.body.contact2,
                 'whatsapp1.number': req.body.whatsapp1,
-                zone: new ObjectId(req.body.zone_id),
                 ...customerAdd
             }
         })
