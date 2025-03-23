@@ -2,69 +2,104 @@ const mongoose = require('mongoose');
 
 const installationSchema = new mongoose.Schema(
     {
-        cid: {
-            type: String,
-            required: true,
-            ref: 'customer_details'
-        },
-        installation_srl_no: {
-            type: String,
-            required: true
-        },
-        index: {
-            type: Number,
-            required: true
-        },
-        date: {
-            type: String,
-            required: true
-        },
-        type_of_product: {
-            type: String,
-            required: true
-        },
-        mode_of_installation: {
-            type: String,
-            required: true
-        },
-        purifier_id: {
-            type: mongoose.Schema.Types.ObjectId,
-        },
-        purifier_name: {
+        prospect_id: {
             type: String
         },
-        purifier_usage: {
-            type: String
-        },
-        pr_description: {
-            type: String
-        },
-        wh_id: {
-            type: mongoose.Schema.Types.ObjectId,
-        },
-        wh_name: {
-            type: String
-        },
-        wh_description: {
-            type: String
-        },
-        installed_by: {
+        technician_id: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: 'staff_datas'
         },
-        spare_list: [{
-            spare_id: {
-                type: String
+        installation_srl_no: {
+            type: String
+        },
+        index: {
+            type: Number
+        },
+        installation_id: {
+            type: String
+        },
+        date: {
+            type: String
+        },
+        site_category: {
+            type: String
+        },
+        products_list: [{
+            cid: {
+                type: String,
+                ref: 'customer_details'
             },
-            spare_type: {
-                type: String
+            product_id: {
+                type: mongoose.Schema.Types.ObjectId
             },
-            quantity: {
+            product_type: {
                 type: Number
-            }
+            },
+            product_name: {
+                type: String  // for old
+            },
+            comment: {
+                type: String  // for old
+            },
+            checkup: {
+                tds_status: {
+                    type: String
+                },
+                input_tds: {
+                    type: Number
+                },
+                output_tds: {
+                    type: Number
+                },
+                ph_status: {
+                    type: String
+                },
+                ph: {
+                    type: Number
+                },
+                filtered_water_flow_ltrs: {
+                    type: Number
+                },
+                v_free_space: {
+                    type: Number
+                }
+            },
+            images: [{
+                url: {
+                    type: String
+                },
+                key: {
+                    type: String
+                }
+            }]
         }],
-        condition_sign: {
+        customer_needs_changes: {
+            type: String
+        },
+        extra_work_comment: {
+            type: String
+        },
+        tech_confirm: {
+            product_verification: {
+                type: Boolean
+            },
+            pdc_collection: {
+                type: Boolean
+            },
+            quotation_handover: {
+                type: Boolean
+            }
+        },
+        received_amount: {
+            amount: {
+                type: Number
+            },
+            pay_id: {
+                type: mongoose.Schema.Types.ObjectId
+            }
+        },
+        condition_sign: {           // for old
             name: {
                 type: String
             },
@@ -75,10 +110,15 @@ const installationSchema = new mongoose.Schema(
                 type: String
             }
         },
+        db_version: {
+            type: String,
+            default: '1.0'
+        }
     },
     {
         timestamps: true
     })
 
-const InstallationModel = mongoose.model('product_installation', installationSchema, 'product_installation')
-module.exports = InstallationModel
+const InstallationV1Model = mongoose.model('installation_form', installationSchema)
+module.exports = InstallationV1Model
+

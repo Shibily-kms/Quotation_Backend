@@ -27,6 +27,31 @@ const doInstall = async (req, res, next) => {
         let customerAdd = {}
         let installationSrl = await createInstallationSrlNumber(installed_at)
 
+        // Upload Signature
+        if (req.body?.signature?.url) {
+            // let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
+            req.body.sign = {
+                // ...customer,
+                name: req.body.customer_name
+            }
+        } else {
+            req.body.sign = {
+                name: req.body.customer_name
+            }
+        }
+
+        const installationObj = {
+            technician_id: req.user.id,
+            installation_srl_no: `I${installationSrl[0]}`,
+            index: installationSrl[1],
+            date: installed_at,
+            products_list: [],
+            site_category: req.body.purifier_usage || null,
+            extra_work_comment: req.body.mode_of_installation,
+            condition_sign: req.body.sign,
+            db_version: '0.5'
+        }
+
         if (req.body.product === 'package' || req.body.product === 'purifier') {
 
             customerAdd = {
@@ -46,8 +71,15 @@ const doInstall = async (req, res, next) => {
                 "purifier_details.carbon_filter_start_date": installed_at,
                 "purifier_details.carbon_filter_expiry_date": YYYYMMDDFormat(new Date(new Date(installed_at).setFullYear(new Date(installed_at).getFullYear() + 1))),
                 "purifier_details.creation_type": 'NEW MACHINE',
-
             }
+
+            installationObj.products_list.push({
+                cid: req.body.cid,
+                product_id: req.body.purifier_id ? new ObjectId(req.body.purifier_id) : undefined,
+                product_type: 1,
+                product_name: req.body.purifier_name,
+                comment: req.body.pr_description
+            })
         }
 
         if (req.body.product === 'package' || req.body.product === 'wh_filter') {
@@ -64,10 +96,16 @@ const doInstall = async (req, res, next) => {
                 "whole_house_details.package_started_date": installed_at,
                 "whole_house_details.package_expiry_date": YYYYMMDDFormat(new Date(new Date(installed_at).setFullYear(new Date(installed_at).getFullYear() + 2))),
                 "whole_house_details.creation_type": 'NEW MACHINE',
-
             }
-        }
 
+            installationObj.products_list.push({
+                cid: req.body.cid,
+                product_id: req.body.wh_id ? new ObjectId(req.body.wh_id) : undefined,
+                product_type: 2,
+                product_name: req.body.wh_name,
+                comment: req.body.wh_description
+            })
+        }
 
         // Update Customer Details
         await CustomerModel.updateOne({ cid }, {
@@ -86,39 +124,9 @@ const doInstall = async (req, res, next) => {
             }
         })
 
-        // Upload Signature
-        if (req.body?.signature?.url) {
-            let customer = await uploadSignature(req.body?.signature?.url, `I${installationSrl[0]}`)
-            req.body.sign = {
-                ...customer,
-                name: req.body.customer_name
-            }
-        } else {
-            req.body.sign = {
-                name: req.body.customer_name
-            }
-        }
-
-
         // Installation DB
-        const inDb = {
-            cid: req.body.cid,
-            installation_srl_no: `I${installationSrl[0]}`,
-            index: installationSrl[1],
-            date: installed_at,
-            type_of_product: req.body.product === 'package' ? 'purifier_wh_package' : req.body.product,
-            mode_of_installation: req.body.mode_of_installation,
-            purifier_id: req.body.purifier_id ? new ObjectId(req.body.purifier_id) : undefined,
-            purifier_name: req.body.purifier_name,
-            purifier_usage: req.body.purifier_usage,
-            pr_description: req.body.pr_description,
-            wh_id: req.body.wh_id ? new ObjectId(req.body.wh_id) : undefined,
-            wh_name: req.body.wh_name,
-            wh_description: req.body.wh_description,
-            installed_by: req.user.id,
-            condition_sign: req.body.sign
-        }
-        const addInstallationData = await InstallationModel.create(inDb)
+
+        await InstallationModel.create(installationObj)
 
         res.status(201).json(successResponse('Installation form Submitted'))
 
@@ -168,7 +176,6 @@ const doReInstall = async (req, res, next) => {
             }
         }
 
-
         // Update Customer Details
         const updateCustomer = await CustomerModel.updateOne({ cid }, {
             $set: {
@@ -199,27 +206,27 @@ const doReInstall = async (req, res, next) => {
             }
         }
 
-
-        // Installation DB
-        const inDb = {
+        const reInstallationObj = {
             cid: req.body.cid,
-            reinstallation_srl_no: `RI${reinstallationSrl[0]}`,
+            rework_srl_no: `RI${reinstallationSrl[0]}`,
             index: reinstallationSrl[1],
+            product_type: req.body.product === 'purifier' ? 1 : 2,
             date: YYYYMMDDFormat(new Date()),
-            type_of_product: req.body.product === 'package' ? 'purifier_wh_package' : req.body.product,
-            mode_of_installation: req.body.mode_of_installation,
-            purifier_id: req.body.purifier_id ? new ObjectId(req.body.purifier_id) : undefined,
-            purifier_name: req.body.purifier_name,
-            purifier_usage: req.body.purifier_usage,
-            pr_description: req.body.pr_description,
-            wh_id: req.body.wh_id ? new ObjectId(req.body.wh_id) : undefined,
-            wh_name: req.body.wh_name,
-            wh_description: req.body.wh_description,
-            installed_by: req.user.id,
+            work_type: 're-installation',
+            product_id: req.body.purifier_id ? new ObjectId(req.body.purifier_id) : req.body.wh_id ? new ObjectId(req.body.wh_id) : undefined,
+            site_category: req.body.purifier_usage || null,
+            description: req?.body?.purifier_usage || req?.body?.wh_description || '',
+            technician: req.user.id,
+            received_amount: req.body?.amount ? {
+                amount: req.body.amount,
+                method: 'CASH'
+            } : undefined,
+            db_version: '0.5',
+            product_name: req?.body?.purifier_name || req?.body?.wh_name,
             condition_sign: req.body.sign,
-            total_amount: req.body.amount
         }
-        const addInstallationData = await ReInstallationModel.create(inDb)
+
+        await ReInstallationModel.create(reInstallationObj)
 
         res.status(201).json(successResponse('ReInstallation form Submitted'))
 

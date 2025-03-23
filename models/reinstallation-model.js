@@ -1,72 +1,95 @@
 const mongoose = require('mongoose');
 
-const reinstallationSchema = new mongoose.Schema(
+const reworkSchema = new mongoose.Schema(
     {
         cid: {
-            type: String,
-            required: true,
-            ref: 'customer_details'
+            type: String
         },
-        reinstallation_srl_no: {
+        rework_srl_no: {
             type: String,
             required: true
         },
         index: {
-            type: Number,
-            required: true
-        },
-        date: {
-            type: String,
-            required: true
-        },
-        type_of_product: {
-            type: String,
-            required: true
-        },
-        mode_of_installation: {
-            type: String,
-            required: true
-        },
-        purifier_id: {
-            type: mongoose.Schema.Types.ObjectId,
-        },
-        purifier_name: {
-            type: String
-        },
-        purifier_usage: {
-            type: String
-        },
-        pr_description: {
-            type: String
-        },
-        wh_id: {
-            type: mongoose.Schema.Types.ObjectId,
-        },
-        wh_name: {
-            type: String
-        },
-        wh_description: {
-            type: String
-        },
-        total_amount: {
             type: Number
         },
-        installed_by: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            ref: 'staff_datas'
+        product_type: {
+            type: Number
         },
-        spare_list: [{
-            spare_id: {
+        date: {
+            type: String
+        },
+        work_type: {
+            type: String
+        },
+        product_id: {
+            type: mongoose.Schema.Types.ObjectId,
+        },
+        site_category: {
+            type: String
+        },
+        description: {
+            type: String
+        },
+        re_filling_included: {
+            type: Boolean,
+            default: false
+        },
+        technician: {
+            type: mongoose.Schema.Types.ObjectId,
+        },
+        in_time: {
+            type: Date
+        },
+        out_time: {
+            type: Date
+        },
+        product_checkup: {
+            tds_status: {
                 type: String
             },
-            spare_type: {
+            input_tds: {
+                type: Number
+            },
+            output_tds: {
+                type: Number
+            },
+            ph_status: {
                 type: String
             },
-            quantity: {
+            ph: {
+                type: Number
+            },
+            filtered_water_flow_ltrs: {
+                type: Number
+            },
+            v_free_space: {
                 type: Number
             }
-        }],
+        },
+        received_amount: {
+            amount: {
+                type: Number
+            },
+            method: {
+                type: String
+            },
+            pay_id: {
+                type: mongoose.Schema.Types.ObjectId,
+            }
+        },
+        verification: {
+            type: Boolean,
+            default: false
+        },
+        db_version: {
+            type: String,
+            default: '1.0'
+        },
+
+        // old version
+        product_name: {
+            type: String
+        },
         condition_sign: {
             name: {
                 type: String
@@ -83,5 +106,5 @@ const reinstallationSchema = new mongoose.Schema(
         timestamps: true
     })
 
-const ReInstallationModel = mongoose.model('product_reinstallation', reinstallationSchema, 'product_reinstallation')
-module.exports = ReInstallationModel
+const ReworkModel = mongoose.model('installation_reworks', reworkSchema, 'installation_reworks')
+module.exports = ReworkModel
